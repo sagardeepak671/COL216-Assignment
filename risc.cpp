@@ -65,11 +65,11 @@ string func3_func7_check(int pc,int funct3, int funct7){
        else if(funct3 == 0x04 )  return "lhu";
        else{cout << "wrong input" << endl;exit(0);}
     }   
-    else if(opcode == 0x23){     // S type 
-       if(funct3 == 0x00 && funct7 == 0x00)  return "sb";
-       else if(funct3 == 0x01 && funct7 == 0x00)  return "sh";
-       else if(funct3 == 0x02 && funct7 == 0x00)  return "sw";
-       else if(funct3 == 0x03 && funct7 == 0x00)  return "sd";
+    else if(opcode == 0x23){     // S type  
+       if(funct3 == 0x00 )  return "sb";
+       else if(funct3 == 0x01 )  return "sh";
+       else if(funct3 == 0x02 )  return "sw";
+       else if(funct3 == 0x03 )  return "sd";
        else{cout << "wrong input" << endl;exit(0);}
     }
     else if(opcode == 0x63){ //B-type 
@@ -81,10 +81,10 @@ string func3_func7_check(int pc,int funct3, int funct7){
        else if(funct3 == 0x07 )  return "bgeu";
        else{cout << "wrong input" << endl;exit(0);}
     }
-    else if(opcode == 0x37 && funct3 == 0x00 && funct7 == 0x00)  return "lui";  
-    else if(opcode == 0x17 && funct3 == 0x01 && funct7 == 0x00) return "auipc"; 
-    else if(opcode == 0x6f && funct3 == 0x00 && funct7 == 0x00) return "jal";  
-    else if(opcode == 0x67 && funct3 == 0x00 && funct7 == 0x00)  return "jalr"; 
+    else if(opcode == 0x37 && funct3 == 0x00 )  return "lui";  
+    else if(opcode == 0x17 && funct3 == 0x01 ) return "auipc"; 
+    else if(opcode == 0x6f && funct3 == 0x00 ) return "jal";  
+    else if(opcode == 0x67 && funct3 == 0x00 )  return "jalr"; 
     return "";
 }
 
@@ -98,7 +98,8 @@ instruction process_instruction(string input_format){
         else {cout << "wrong input" << endl;exit(0);}
     }  
     int pc = binarystring_to_decimalint(binary_format); 
-    // extracting opcode rd,rs1,rs2,imm 
+    // extracting opcode rd,rs1,rs2,imm  
+
     int opcode = pc & 0x7f; 
     instruction ins;
     if(opcode == 0x33) {
@@ -225,7 +226,7 @@ instruction process_instruction(string input_format){
 string get_expression(instruction &ins){
     if(ins.type == 'R')return ins.opcode + " x"+ to_string(ins.rd) + " x"+ to_string(ins.rs1) + " x"+ to_string(ins.rs2) ;
     else if(ins.type == 'I') return ins.opcode + " x"+ to_string(ins.rd) + " x"+ to_string(ins.rs1) + " " + to_string(ins.imm) ;
-    else if(ins.type == 'S')return ins.opcode + " x"+ to_string(ins.rd) + " x"+ to_string(ins.rs1) + " " + to_string(ins.imm) + " x"+ to_string(ins.rs2);
+    else if(ins.type == 'S')return ins.opcode + " x"+ to_string(ins.rs2)  + " " + to_string(ins.imm)+ " x"+ to_string(ins.rs1);
     else if(ins.type == 'B') return ins.opcode + " x"+ to_string(ins.rs1) + " x"+ to_string(ins.rs2) + " " + to_string(ins.imm);
     else if(ins.type == 'U')return ins.opcode + " x"+ to_string(ins.rd) + " " + to_string(ins.imm);
     else if(ins.type == 'J')return ins.opcode + " x"+ to_string(ins.rd) + ", " + to_string(ins.imm);
@@ -295,7 +296,7 @@ void Without_Forwarding(vector<instruction> &pc,int m){
  
     vector<char> command_stage(n,'-');   // current stage on this instruction , - mean not in any stage
     map<int,int> mp ={ {'I',-1}, {'D',-1}, {'E',-1}, {'M',-1}, {'W',-1} };   // map to store whether stage is free or not
-    memory[6]=12;
+    memory[11]=12;
     vector<string> ans(n,"");
     int next_pc_address = 0;  // for jumping and initial pc address 
     int max_pc_address = 0;   // for next pc address for instruction fetch
@@ -390,7 +391,7 @@ int main(){
     vector<instruction> instructions(n);
     for(int i=0;i<n;i++){ 
         instructions[i] = process_instruction(input_instructions[i]);
-    } 
+    }
 
     int m=50; // input the number of vertical columns to print
     // printing the pipeline with 5 stages without Forwarding
