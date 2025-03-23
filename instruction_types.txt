@@ -1,0 +1,108 @@
+🟢 1. R-Type (Register-Register Operations)
+
+    Used for: Arithmetic & logical operations.
+
+    Format:
+
+    funct7 (7-bit) | rs2 (5-bit) | rs1 (5-bit) | funct3 (3-bit) | rd (5-bit) | opcode (7-bit)
+
+    Immediate? ❌ No
+
+Instruction	opcode (hex)	rd (0x0-0x1F)	funct3 (hex)	rs1 (0x0-0x1F)	rs2 (0x0-0x1F)	funct7 (hex)	Description
+add	0x33	✅	0x0	✅	✅	0x00	Add
+sub	0x33	✅	0x0	✅	✅	0x20	Subtract
+sll	0x33	✅	0x1	✅	✅	0x00	Shift left logical
+srl	0x33	✅	0x5	✅	✅	0x00	Shift right logical
+sra	0x33	✅	0x5	✅	✅	0x20	Shift right arithmetic
+xor	0x33	✅	0x4	✅	✅	0x00	XOR
+or	0x33	✅	0x6	✅	✅	0x00	OR
+and	0x33	✅	0x7	✅	✅	0x00	AND
+
+🟡 2. I-Type (Immediate Operations & Loads)
+
+    Used for: Immediate arithmetic, logical operations, and load instructions.
+
+    Format:
+
+    imm (12-bit) | rs1 (5-bit) | funct3 (3-bit) | rd (5-bit) | opcode (7-bit)
+
+    Immediate? ✅ Yes (12-bit signed)
+
+Instruction	opcode (hex)	rd (0x0-0x1F)	funct3 (hex)	rs1 (0x0-0x1F)	imm[11:0] (hex)	Description
+addi	0x13	✅	0x0	✅	✅	Add immediate
+xori	0x13	✅	0x4	✅	✅	XOR immediate
+ori	    0x13	✅	0x6	✅	✅	OR immediate
+andi	0x13	✅	0x7	✅	✅	AND immediate
+slli	0x13	✅	0x1	✅	✅ (shamt)	Shift left immediate
+srli	0x13	✅	0x5	✅	✅ (shamt)	Shift right logical
+srai	0x13	✅	0x5	✅	✅ (shamt, funct7=0x20)	Shift right arithmetic
+    lb	0x03	✅	0x0	✅	✅	Load byte
+    lh	0x03	✅	0x1	✅	✅	Load halfword
+    lw	0x03	✅	0x2	✅	✅	Load word
+    lbu	0x03	✅	0x4	✅	✅	Load byte unsigned
+    lhu	0x03	✅	0x5	✅	✅	Load halfword unsigned
+
+
+
+🟠 3. S-Type (Store Instructions)
+
+    Used for: Storing values from registers to memory.
+
+    Format:
+
+    imm[11:5] (7-bit) | rs2 (5-bit) | rs1 (5-bit) | funct3 (3-bit) | imm[4:0] (5-bit) | opcode (7-bit)
+
+    Immediate? ✅ Yes (12-bit split)
+
+Instruction	opcode (hex)	funct3 (hex)	rs1 (0x0-0x1F)	rs2 (0x0-0x1F)	imm[11:0] (hex)	Description
+sb	0x23	0x0	✅	✅	✅	Store byte
+sh	0x23	0x1	✅	✅	✅	Store halfword
+sw	0x23	0x2	✅	✅	✅	Store word
+
+🔴 4. B-Type (Branch Instructions)
+
+    Used for: Conditional branching.
+
+    Format:
+
+    imm[12|10:5] (7-bit) | rs2 (5-bit) | rs1 (5-bit) | funct3 (3-bit) | imm[4:1|11] (5-bit) | opcode (7-bit)
+
+    Immediate? ✅ Yes (12-bit split)
+
+Instruction	opcode (hex)	funct3 (hex)	rs1 (0x0-0x1F)	rs2 (0x0-0x1F)	imm[12:1] (hex)	Description
+    beq	0x63	0x0	✅	✅	✅	Branch if equal
+    bne	0x63	0x1	✅	✅	✅	Branch if not equal
+    blt	0x63	0x4	✅	✅	✅	Branch if less than
+    bge	0x63	0x5	✅	✅	✅	Branch if greater/equal
+bltu	0x63	0x6	✅	✅	✅	Branch if less than (unsigned)
+bgeu	0x63	0x7	✅	✅	✅	Branch if greater/equal (unsigned)
+
+
+🟣 5. U-Type (Upper Immediate Instructions)
+
+    Used for: Loading immediate values into upper bits.
+
+    Format:
+
+    imm[31:12] (20-bit) | rd (5-bit) | opcode (7-bit)
+
+    Immediate? ✅ Yes (20-bit)
+
+Instruction	opcode (hex)	rd (0x0-0x1F)	imm[31:12] (hex)	Description
+    lui	0x37	✅	✅	Load upper immediate
+auipc	0x17	✅	✅	Add upper immediate to PC
+
+
+🔵 6. J-Type (Jump Instructions)
+
+    Used for: Unconditional jumps.
+
+    Format:
+
+    imm[20|10:1|11|19:12] (20-bit) | rd (5-bit) | opcode (7-bit)
+
+    Immediate? ✅ Yes (20-bit split)
+
+Instruction	opcode (hex)	rd (0x0-0x1F)	imm[20:1] (hex)	Description
+    jal	0x6F	✅	✅	Jump and link
+jalr	0x67	✅	✅ (12-bit)	Jump and link register
