@@ -1,29 +1,10 @@
-# Compiler
-CXX = g++
+all: forwarding non_forwarding
 
-# Compiler flags
-CXXFLAGS = -Wall -Wextra -std=c++17
+forwarding: src/forwarding.cpp src/main.cpp src/utils.cpp src/instructions.cpp
+	g++ -o forwarding $^
 
-# Executable name
-TARGET = program
+non_forwarding: src/non_forwarding.cpp src/main.cpp src/utils.cpp src/instructions.cpp
+	g++ -o non_forwarding $^
 
-# Source files
-SRCS = risc.cpp prettyPrint.cpp
-
-# Object files
-OBJS = $(SRCS:.cpp=.o)
-
-# Default target
-all: $(TARGET)
-
-# Compile and link the executable
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
-
-# Compile .cpp files into .o files
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Clean up object files and executable
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f forwarding non_forwarding

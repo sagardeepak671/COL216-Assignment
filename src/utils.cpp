@@ -1,4 +1,8 @@
-#include "prettyPrint.h"
+#include "utils.hpp"
+#include "instructions.hpp"
+#include <bits/stdc++.h>
+
+
 
 // Helper function to split a string by a delimiter
 vector<string> split(const string &s, char delim) {
@@ -55,4 +59,26 @@ void prettyPrint(const vector<string>& ans2, const vector<string>& ans) {
         }
         cout << endl;
     }
+}
+
+
+vector<instruction> takeInput(ifstream &input_file){
+    vector<string> input_instructions;
+    string instr;
+    if(!input_file.is_open()){
+        cerr << "error opening the file " << endl;
+        return vector<instruction>();
+    }
+    while(input_file >> instr) {
+        input_instructions.push_back(instr);
+    } 
+    input_file.close();
+
+    int n = input_instructions.size();
+    vector<instruction> instructions(n);
+    for(int i = 0; i < n; i++) { 
+        instructions[i] = process_instruction(input_instructions[i]);
+    }
+
+    return instructions;
 }
