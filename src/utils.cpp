@@ -1,6 +1,8 @@
 #include "utils.hpp"
 #include "instructions.hpp"
 #include <bits/stdc++.h>
+#include "main.hpp"
+using namespace std;
 
 
 
@@ -81,4 +83,14 @@ vector<instruction> takeInput(ifstream &input_file){
     }
 
     return instructions;
+}
+
+
+string read_line(int n){
+    ifstream input_file(input_file_name);
+    string instr;
+    for(int i = 0; i < n; i++){
+        input_file >> instr;
+    }
+    return instr;
 }

@@ -59,60 +59,80 @@ string func3_func7_check(int pc,int funct3, int funct7){
 }
 
 
-int update_register_value(instruction &ins, int &next_pc_address, int j) { 
+void update_register_value(instruction &ins) { 
     if(ins.type == 'R') { 
-        if(ins.opcode == "add") register_value[ins.rd] = register_value[ins.rs1] + register_value[ins.rs2];
-        else if(ins.opcode == "sub") register_value[ins.rd] = register_value[ins.rs1] - register_value[ins.rs2];
-        else if(ins.opcode == "sll") register_value[ins.rd] = register_value[ins.rs1] << register_value[ins.rs2];
-        else if(ins.opcode == "slt") register_value[ins.rd] = (register_value[ins.rs1] < register_value[ins.rs2]) ? 1 : 0;
-        else if(ins.opcode == "sltu") register_value[ins.rd] = (register_value[ins.rs1] < register_value[ins.rs2]) ? 1 : 0;
-        else if(ins.opcode == "xor") register_value[ins.rd] = register_value[ins.rs1] ^ register_value[ins.rs2];
-        else if(ins.opcode == "srl") register_value[ins.rd] = register_value[ins.rs1] >> register_value[ins.rs2];
-        else if(ins.opcode == "sra") register_value[ins.rd] = register_value[ins.rs1] >> register_value[ins.rs2];
-        else if(ins.opcode == "or") register_value[ins.rd] = register_value[ins.rs1] | register_value[ins.rs2];
+        register_value[ins.rd] = ins.result;
     }
     else if(ins.type == 'I') {
-        if(ins.opcode == "addi") register_value[ins.rd] = register_value[ins.rs1] + ins.imm;
-        else if(ins.opcode == "slti") register_value[ins.rd] = (register_value[ins.rs1] < ins.imm) ? 1 : 0;
-        else if(ins.opcode == "sltiu") register_value[ins.rd] = (register_value[ins.rs1] < ins.imm) ? 1 : 0;
-        else if(ins.opcode == "xori") register_value[ins.rd] = register_value[ins.rs1] ^ ins.imm;
-        else if(ins.opcode == "ori") register_value[ins.rd] = register_value[ins.rs1] | ins.imm;
-        else if(ins.opcode == "andi") register_value[ins.rd] = register_value[ins.rs1] & ins.imm;
-        else if(ins.opcode == "slli") register_value[ins.rd] = register_value[ins.rs1] << ins.imm;
-        else if(ins.opcode == "srli") register_value[ins.rd] = register_value[ins.rs1] >> ins.imm;
-        else if(ins.opcode == "srai") register_value[ins.rd] = register_value[ins.rs1] >> ins.imm;
-        else if(ins.opcode == "lb") register_value[ins.rd] = memory[ins.rs1+ins.imm];
-        else if(ins.opcode == "lh") register_value[ins.rd] = memory[ins.rs1+ins.imm];
-        else if(ins.opcode == "lw") register_value[ins.rd] = memory[ins.rs1+ins.imm];
-        else if(ins.opcode == "lbu") register_value[ins.rd] = memory[ins.rs1+ins.imm];
-        else if(ins.opcode == "lhu") register_value[ins.rd] = memory[ins.rs1+ins.imm];
-        else if(ins.opcode == "lwu") register_value[ins.rd] = memory[ins.rs1+ins.imm];
-        else if(ins.opcode == "ld") register_value[ins.rd] = memory[ins.rs1+ins.imm]; 
+        if(ins.opcode == "lb" || ins.opcode == "lh" || ins.opcode == "lw" || ins.opcode == "lbu" || ins.opcode == "lhu")return;
+        register_value[ins.rd] = ins.result;
+
+    }
+    else if(ins.type == 'U') {
+        register_value[ins.rd] = ins.result;
+    }
+}
+
+void memory_access(instruction &ins){
+    if(ins.type == 'I'){
+        if(ins.opcode == "lb" || ins.opcode == "lbu" || ins.opcode == "lh" || ins.opcode == "lhu" || ins.opcode == "lw") ins.result = memory[ins.result];
+    }
+    else if(ins.type == 'S'){
+        if(ins.opcode == "sb" || ins.opcode == "sh" || ins.opcode == "sw" || ins.opcode == "sd") memory[ins.imm] = ins.result;  
+    }    
+}
+
+int execute(instruction &ins){
+    if(ins.type == 'R') { 
+        if(ins.opcode == "add") return ins.rs1_value + ins.rs2_value;
+        else if(ins.opcode == "sub") return ins.rs1_value - ins.rs2_value;
+        else if(ins.opcode == "sll") return ins.rs1_value << ins.rs2_value;
+        else if(ins.opcode == "slt") return (ins.rs1_value < ins.rs2_value) ? 1 : 0;
+        else if(ins.opcode == "sltu") return (ins.rs1_value < ins.rs2_value) ? 1 : 0;
+        else if(ins.opcode == "xor") return ins.rs1_value ^ ins.rs2_value;
+        else if(ins.opcode == "srl") return ins.rs1_value >> ins.rs2_value;
+        else if(ins.opcode == "sra") return ins.rs1_value >> ins.rs2_value;
+        else if(ins.opcode == "or") return ins.rs1_value | ins.rs2_value;
+    }
+    else if(ins.type == 'I') {
+        if(ins.opcode == "addi") return ins.rs1_value + ins.imm;
+        else if(ins.opcode == "slti") return (ins.rs1_value < ins.imm) ? 1 : 0;
+        else if(ins.opcode == "sltiu") return (ins.rs1_value < ins.imm) ? 1 : 0;
+        else if(ins.opcode == "xori") return ins.rs1_value ^ ins.imm;
+        else if(ins.opcode == "ori") return ins.rs1_value | ins.imm;
+        else if(ins.opcode == "andi") return ins.rs1_value & ins.imm;
+        else if(ins.opcode == "slli") return ins.rs1_value << ins.imm;
+        else if(ins.opcode == "srli") return ins.rs1_value >> ins.imm;
+        else if(ins.opcode == "srai") return ins.rs1_value >> ins.imm;
+        else if(ins.opcode == "lb") return ins.rs1_value+ins.imm;
+        else if(ins.opcode == "lh") return ins.rs1_value+ins.imm;
+        else if(ins.opcode == "lw") return ins.rs1_value+ins.imm;
+        else if(ins.opcode == "lbu") return ins.rs1_value+ins.imm;
+        else if(ins.opcode == "lhu") return ins.rs1_value+ins.imm;
+        else if(ins.opcode == "lwu") return ins.rs1_value+ins.imm;
+        else if(ins.opcode == "ld") return ins.rs1_value+ins.imm; 
 
     }
     else if(ins.type == 'S') {
-        if(ins.opcode == "sb") memory[ins.imm] = register_value[ins.rs2];
-        else if(ins.opcode == "sh") memory[ins.imm] = register_value[ins.rs2];
-        else if(ins.opcode == "sw") memory[ins.imm] = register_value[ins.rs2];
-        else if(ins.opcode == "sd") memory[ins.imm] = register_value[ins.rs2];
-    }
-    else if(ins.type == 'B') {
-        if(ins.opcode == "beq" && register_value[ins.rs1] == register_value[ins.rs2]){ next_pc_address = j + ins.imm/4; return true; }
-        else if(ins.opcode == "bne" && register_value[ins.rs1] != register_value[ins.rs2]){ next_pc_address = j + ins.imm/4; return true; }
-        else if(ins.opcode == "blt" && register_value[ins.rs1] < register_value[ins.rs2]){ next_pc_address = j + ins.imm/4; return true; }
-        else if(ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2]){ next_pc_address = j + ins.imm/4; return true; }
-        else if(ins.opcode == "bltu" && register_value[ins.rs1] < register_value[ins.rs2]){ next_pc_address = j + ins.imm/4; return true; }
-        else if(ins.opcode == "bgeu" && register_value[ins.rs1] >= register_value[ins.rs2]){ next_pc_address = j + ins.imm/4; return true; }
+        if(ins.opcode == "sb") return ins.rs2_value;
+        else if(ins.opcode == "sh") return ins.rs2_value;
+        else if(ins.opcode == "sw") return ins.rs2_value;
+        else if(ins.opcode == "sd") return ins.rs2_value;
     }
     else if(ins.type == 'U') {
-        if(ins.opcode == "lui") register_value[ins.rd] = ins.imm;
-        else if(ins.opcode == "auipc") register_value[ins.rd] = ins.imm + ins.imm; 
+        if(ins.opcode == "lui") return ins.imm;
+        else if(ins.opcode == "auipc") return ins.imm + ins.imm; 
     }
-    else if(ins.type == 'J'){
-        if(ins.opcode == "jal"){ next_pc_address = j + ins.imm/4; return true;}
-        else if(ins.opcode == "jalr"){ next_pc_address = j + ins.imm/4; return true;}
-    }  
-    return false;
+    return 0;
+}
+
+int manage_branch(instruction &ins){
+        if(ins.opcode == "beq" && register_value[ins.rs1] == register_value[ins.rs2]){return ins.imm/4; }
+        else if(ins.opcode == "bne" && register_value[ins.rs1] != register_value[ins.rs2]){ return ins.imm/4; }
+        else if(ins.opcode == "blt" && register_value[ins.rs1] < register_value[ins.rs2]){ return ins.imm/4; }
+        else if(ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2]){ return ins.imm/4; }
+        else if(ins.opcode == "bltu" && register_value[ins.rs1] < register_value[ins.rs2]){ return ins.imm/4; }
+        else if(ins.opcode == "bgeu" && register_value[ins.rs1] >= register_value[ins.rs2]){ return ins.imm/4; }
 }
 
 

@@ -16,5 +16,6 @@ vector<string> split(const string &s, char delim);
 void prettyPrint(const vector<string>& ans2, const vector<string>& ans);
 
 vector<instruction> takeInput(ifstream &input_file);
+string read_line(int n);
 
 #endif // PRETTY_PRINT_H

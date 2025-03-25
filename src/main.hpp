@@ -7,6 +7,8 @@ using namespace std;
 extern bool write_enabled[33];
 extern int register_value[33];
 extern map<int,int> memory;
+extern string input_file_name;
+extern string output_file_name;
 
 
 const string HEX_TO_BIN[] = {
