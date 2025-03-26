@@ -176,7 +176,7 @@ instruction process_instruction(string input_format){
         ins.rs1 = ((pc >> 15) & 0x1f);
         ins.rd = ((pc >> 7) & 0x1f);
         ins.imm = ((pc >> 20) & 0xfff);
-         // **Sign Extension for negative numbers**
+         // Sign Extension for negative numbers
         if (ins.imm & 0x800) {  // If bit 11 (sign bit) is 1
             ins.imm |= 0xfffff000;  // Extend upper bits with 1s
         }
@@ -189,7 +189,7 @@ instruction process_instruction(string input_format){
         ins.rs1 = (pc >> 15) & 0x1f;
         ins.rd = (pc >> 7) & 0x1f;
         ins.imm = (pc >> 20) & 0xfff;
-         // **Sign Extension for negative numbers**
+         // Sign Extension for negative numbers
         if (ins.imm & 0x800) {  // If bit 11 (sign bit) is 1
             ins.imm |= 0xfffff000;  // Extend upper bits with 1s
         }
@@ -204,7 +204,7 @@ instruction process_instruction(string input_format){
         ins.rs2 = (pc >> 20) & 0x1f;
         ins.imm = ((pc >> 25) & 0x7f) << 5 | ((pc >> 7) & 0x1f);
         ins.funct3 = (pc >> 12) & 0x7;
-        // **Sign Extension** for negative values
+        // Sign Extension for negative values
         if (ins.imm & 0x800) {  // If bit 11 (sign bit) is 1
             ins.imm |= 0xfffff000;  // Extend upper bits with 1s
         }
@@ -220,7 +220,7 @@ instruction process_instruction(string input_format){
                   ((pc >> 25) & 0x3f) << 5 |
                   ((pc >> 8) & 0xf) << 1;
         ins.funct3 = (pc >> 12) & 0x7;
-         // **Sign Extension** for negative values
+         // Sign Extension for negative values
             if (ins.imm & 0x1000) {  // If bit 12 (sign bit) is 1
                 ins.imm |= 0xffffe000;  // Extend upper bits with 1s
             }

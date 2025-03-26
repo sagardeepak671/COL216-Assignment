@@ -11,6 +11,7 @@ map<int,int> memory;   // RAM
 vector<vector<int>> ans;
 string input_file_name;
 string output_file_name;
+int number_of_instructions;
 //ans is a vector of vector of size 5 which contains the instruction number at each stage 
 
 // - mean not in any stage 
@@ -163,8 +164,12 @@ void push_next_stage(pipeline_stage &pipeline,string instruction_fetched,instruc
         pipeline.instruction_fetched = instruction_fetched;
         pipeline.ID_instruction_number = pipeline.IF_instruction_number;
     }
-
-    pipeline.IF_instruction_number = pipeline.pc_address;
+    if(pipeline.pc_address >= number_of_instructions){
+        pipeline.IF_instruction_number = -1;
+    }
+    else{
+        pipeline.IF_instruction_number = pipeline.pc_address;
+    }
     
 }
 
@@ -174,7 +179,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     bool stall=false;
     if(instruction_decoded.rs1!=32 ){
         if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_decoded.rd){
-            if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu"))
+            if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu" && instruction_decoded.type!='B'))
                 instruction_decoded.rs1_value = pipeline.instruction_decoded.rs1_value;
                 
             else stall=true;
@@ -191,7 +196,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     }
     if(instruction_decoded.rs2!=32 ){
         if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
-            if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu"))
+            if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu" && instruction_decoded.type!='B'))
                 instruction_decoded.rs2_value = pipeline.instruction_executed.rs2_value;
                 
             else stall=true;
@@ -275,13 +280,15 @@ void proccessor(bool forwarding, int number_of_cycles,string input_file,string o
     output_file_name = output_file;
     int current_cycle_number=0;
     pipeline_stage pipeline;
-    int number_of_instructions = count_number_of_instructions();
+    number_of_instructions = count_number_of_instructions();
+    cout<<"number of instructions: "<<number_of_instructions<<endl;
     pipeline.IF_instruction_number = 0;
     while(current_cycle_number < number_of_cycles){
         cout<<"CYCLE NUMBER: "<<current_cycle_number<<endl;
         compute(pipeline,forwarding);
         cout<<"--------------------------------"<<endl;
         current_cycle_number++;
+
     }
     for(int i=0;i<ans.size();i++){
         for(int j=0;j<ans[i].size();j++){
@@ -290,5 +297,6 @@ void proccessor(bool forwarding, int number_of_cycles,string input_file,string o
         cout<<endl;
     }
     vector<string> ans_str=extract_second_column();
-    prettyPrint(ans_str,ans,number_of_instructions,number_of_cycles);
+    prettyPrint(ans_str,ans,number_of_instructions,current_cycle_number);
+
 }
