@@ -16,6 +16,6 @@ const string HEX_TO_BIN[] = {
     "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"
 };
 
-void processor(vector<instruction> &pc,int m,bool forwarding);
+void proccessor(bool forwarding, int number_of_cycles,string input_file_name,string output_file_name);
 
 #endif

@@ -10,12 +10,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    ifstream input_file(argv[1]);
+    string input_file_name = argv[1];
+    string output_file_name = "output_forwarding.txt";
 
-    vector<instruction> input_instructions = takeInput(input_file);
-
-    int m = 50; // number of cycles
-    processor(input_instructions, m, true);
+    int number_of_cycles = 25;
+    proccessor(true, number_of_cycles,input_file_name,output_file_name);
     return 0;
 }
 

@@ -8,7 +8,10 @@ using namespace std;
 bool write_enabled[33]= {false};
 int register_value[33]= {0};
 map<int,int> memory;   // RAM
-
+vector<vector<int>> ans;
+string input_file_name;
+string output_file_name;
+//ans is a vector of vector of size 5 which contains the instruction number at each stage 
 
 // - mean not in any stage 
 // I mean in IF stage
@@ -122,35 +125,47 @@ map<int,int> memory;   // RAM
 class pipeline_stage{
 public:
     int pc_address=0;
-    bool IF_free=true;
+    int IF_instruction_number=-1;
     string instruction_fetched;//used in ID stage
-    bool ID_free=true;
+    int ID_instruction_number=-1;
     instruction instruction_decoded;//used in EX stage
-    bool EX_free=true;
+    int EX_instruction_number=-1;
     instruction instruction_executed;//used in MEM stage
-    bool MEM_free=true;
+    int MEM_instruction_number=-1;
     instruction instruction_memory_accessed;//used in WB stage
-    bool WB_free=true;
+    int WB_instruction_number=-1;
 };
 
-void push_next_stage(pipeline_stage &pipeline,string instruction_fetched,instruction instruction_decoded,bool forwarding){
+void push_next_stage(pipeline_stage &pipeline,string instruction_fetched,instruction instruction_decoded,bool forwarding,bool stall){
     //push instruction to next stage
-    if(!pipeline.MEM_free){
-        pipeline.instruction_memory_accessed = pipeline.instruction_executed;
-        pipeline.WB_free = false;
-    }
-    if(!pipeline.EX_free){
-        pipeline.instruction_executed = pipeline.instruction_decoded;
-        pipeline.MEM_free = false;
-    }
-    if(!pipeline.ID_free){
+
+    //pushing the instruction from MEM stage to WB stage
+    pipeline.instruction_memory_accessed = pipeline.instruction_executed;
+    pipeline.WB_instruction_number = pipeline.MEM_instruction_number;
+
+    
+    //pushing the instruction from EX stage to MEM stage
+    pipeline.instruction_executed = pipeline.instruction_decoded;
+    pipeline.MEM_instruction_number = pipeline.EX_instruction_number;
+    
+    //ID to EX stage
+    if(!stall){
         pipeline.instruction_decoded= instruction_decoded;
-        pipeline.EX_free = false;
+        pipeline.EX_instruction_number = pipeline.ID_instruction_number;
     }
-    if(!pipeline.IF_free){
+    else{
+        pipeline.EX_instruction_number = -1;
+    }
+
+    
+    //IF to ID stage
+    if(!stall){
         pipeline.instruction_fetched = instruction_fetched;
-        pipeline.ID_free = false;
+        pipeline.ID_instruction_number = pipeline.IF_instruction_number;
     }
+
+    pipeline.IF_instruction_number = pipeline.pc_address;
+    
 }
 
 bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,bool forwarding){
@@ -158,15 +173,15 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     //returns true if stall needed
     bool stall=false;
     if(instruction_decoded.rs1!=32 ){
-        if(!pipeline.EX_free && instruction_decoded.rs1==pipeline.instruction_decoded.rd){
+        if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_decoded.rd){
             if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu"))
-                instruction_decoded.rs1 = pipeline.instruction_decoded.result;
+                instruction_decoded.rs1_value = pipeline.instruction_decoded.rs1_value;
                 
             else stall=true;
         }
-        else if(!pipeline.MEM_free && instruction_decoded.rs1==pipeline.instruction_memory_accessed.rd){
+        else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_executed.rd){
             if(forwarding)
-                instruction_decoded.rs1 = pipeline.instruction_memory_accessed.result;
+                instruction_decoded.rs1_value = pipeline.instruction_executed.rs1_value;
             
             else stall=true;
         }
@@ -175,15 +190,15 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
         }
     }
     if(instruction_decoded.rs2!=32 ){
-        if(!pipeline.EX_free && instruction_decoded.rs2==pipeline.instruction_executed.rd){
-            if(forwarding)
-                instruction_decoded.rs2 = pipeline.instruction_executed.result;
+        if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
+            if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu"))
+                instruction_decoded.rs2_value = pipeline.instruction_executed.rs2_value;
                 
             else stall=true;
         }
-        else if(!pipeline.MEM_free && instruction_decoded.rs2==pipeline.instruction_memory_accessed.rd){
+        else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
             if(forwarding)
-                instruction_decoded.rs2 = pipeline.instruction_memory_accessed.result;
+                instruction_decoded.rs2_value = pipeline.instruction_executed.rs2_value;
             
             else stall=true;
         }
@@ -191,6 +206,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             instruction_decoded.rs2_value = register_value[instruction_decoded.rs2];
         }
     }
+    cout<< " stall for instruction: "<<instruction_decoded.opcode<<" "<<instruction_decoded.rd<<" "<<instruction_decoded.rs1<<" "<<instruction_decoded.rs2<<" is "<<stall<<endl;
     return stall;
 }
 
@@ -199,42 +215,80 @@ void compute(pipeline_stage &pipeline,bool forwarding){
     instruction instruction_decoded;
     string instruction_fetched;
     bool stall=false;
-    if(!pipeline.IF_free){
-        instruction_fetched = read_line(pipeline.pc_address);
-    }
-    if(!pipeline.ID_free){
-        instruction_decoded = process_instruction(pipeline.instruction_fetched);
-        int jump=1;
-        stall = get_rs_values(pipeline,instruction_decoded,forwarding);
-        if(instruction_decoded.type == 'B'){
-            jump = manage_branch(instruction_decoded);
-        }
-        else if(instruction_decoded.type == 'J'){
-            jump = instruction_decoded.imm/4;
-        }
-        if(stall)jump=0;
-        pipeline.pc_address += jump;
-    }
-    if(!pipeline.EX_free){
-        int result =execute(pipeline.instruction_decoded);
-        pipeline.instruction_decoded.result = result;
-    }
-    if(!pipeline.MEM_free){
-        memory_access(pipeline.instruction_decoded);
-    }
-    if(!pipeline.WB_free){
+    int jump=1;
+
+
+    ans.push_back({pipeline.IF_instruction_number,pipeline.ID_instruction_number,pipeline.EX_instruction_number,pipeline.MEM_instruction_number,pipeline.WB_instruction_number});
+    // cout<<"IF"<<" "<<"ID"<<" "<<"EX"<<" "<<"MEM"<<" "<<"WB"<<endl;
+    // cout<<pipeline.IF_instruction_number<<"  "<<pipeline.ID_instruction_number<<"  "<<pipeline.EX_instruction_number<<"  "<<pipeline.MEM_instruction_number<<"  "<<pipeline.WB_instruction_number<<endl;
+
+    if(pipeline.WB_instruction_number != -1){
+        cout<<"updating register value for instruction: "<<pipeline.instruction_memory_accessed.opcode<<" "<<pipeline.instruction_memory_accessed.rd<<" "<<pipeline.instruction_memory_accessed.rs1<<" "<<pipeline.instruction_memory_accessed.rs2<<endl;
         update_register_value(pipeline.instruction_memory_accessed);
     }
 
-    push_next_stage(pipeline,instruction_fetched,instruction_decoded,forwarding);
+    if(pipeline.MEM_instruction_number != -1){
+        cout<<"memory access instruction: "<<pipeline.instruction_decoded.opcode<<" "<<(int)pipeline.instruction_decoded.rd<<" "<<(int)pipeline.instruction_decoded.rs1<<" "<<(int)pipeline.instruction_decoded.rs2<<endl;
+        memory_access(pipeline.instruction_decoded);
+    }
+
+    if(pipeline.EX_instruction_number != -1){
+        cout<<"executing instruction: "<<pipeline.instruction_decoded.opcode<<" "<<(int)pipeline.instruction_decoded.rd<<" "<<(int)pipeline.instruction_decoded.rs1<<" "<<(int)pipeline.instruction_decoded.rs2<<endl;
+        int result =execute(pipeline.instruction_decoded);
+        cout<<"result: "<<result<<endl;
+        pipeline.instruction_decoded.result = result;
+    }
+
+    if(pipeline.ID_instruction_number != -1){
+        cout<<"decoding instruction: "<<pipeline.instruction_fetched<<endl;
+        instruction_decoded = process_instruction(pipeline.instruction_fetched);
+        cout<<"instruction decoded: "<<instruction_decoded.opcode<<" "<<(int)instruction_decoded.rd<<"-"<<(int)instruction_decoded.rs1<<" "<<(int)instruction_decoded.rs2<<endl;
+        stall = get_rs_values(pipeline,instruction_decoded,forwarding);
+        //by default branch not taken
+        // if(instruction_decoded.type == 'B'){
+        //     // jump = manage_branch(instruction_decoded);    
+        // }
+        if(instruction_decoded.type == 'J'){
+            jump = instruction_decoded.imm/4;
+        }
+        if(stall)jump=0;
+        cout<<"jump: "<<jump<<endl;
+        cout<<"stall: "<<stall<<endl;
+    }
+
+    if(pipeline.IF_instruction_number != -1){
+        instruction_fetched = read_line(pipeline.pc_address);
+        cout<<"instruction fetched: "<<instruction_fetched<<endl;
+    }
+
+    pipeline.pc_address += jump;
+    cout<<"pc address: "<<pipeline.pc_address<<endl;
+    push_next_stage(pipeline,instruction_fetched,instruction_decoded,forwarding,stall);
+
 }
 
-void proccessor(bool forwarding, int number_of_cycles){
+
+
+
+void proccessor(bool forwarding, int number_of_cycles,string input_file,string output_file){
+    input_file_name = input_file;
+    output_file_name = output_file;
     int current_cycle_number=0;
     pipeline_stage pipeline;
+    int number_of_instructions = count_number_of_instructions();
+    pipeline.IF_instruction_number = 0;
     while(current_cycle_number < number_of_cycles){
-        pipeline.IF_free = false;
+        cout<<"CYCLE NUMBER: "<<current_cycle_number<<endl;
         compute(pipeline,forwarding);
-
+        cout<<"--------------------------------"<<endl;
+        current_cycle_number++;
     }
+    for(int i=0;i<ans.size();i++){
+        for(int j=0;j<ans[i].size();j++){
+            cout<<ans[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+    vector<string> ans_str=extract_second_column();
+    prettyPrint(ans_str,ans,number_of_instructions,number_of_cycles);
 }

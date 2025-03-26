@@ -10,12 +10,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    ifstream input_file(argv[1]);
-    vector<instruction> input_instructions = takeInput(input_file);
-    input_file.close();
+    string input_file_name = argv[1];
+    string output_file_name = "output_non_forwarding.txt";
 
-
-    int m = 50; // number of cycles
-    processor(input_instructions, m, false);
+    int number_of_cycles = 25;
+    proccessor(false, number_of_cycles,input_file_name,output_file_name);
     return 0;
 }

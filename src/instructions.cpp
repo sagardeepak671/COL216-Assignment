@@ -133,6 +133,7 @@ int manage_branch(instruction &ins){
         else if(ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2]){ return ins.imm/4; }
         else if(ins.opcode == "bltu" && register_value[ins.rs1] < register_value[ins.rs2]){ return ins.imm/4; }
         else if(ins.opcode == "bgeu" && register_value[ins.rs1] >= register_value[ins.rs2]){ return ins.imm/4; }
+        return 0;
 }
 
 
@@ -172,9 +173,9 @@ instruction process_instruction(string input_format){
     else if(opcode == 0x13) {
         //| imm[11:0] (12 bits) | rs1 (5 bits) | funct3 (3 bits) | rd (5 bits) | opcode (7 bits) |
         ins.type = 'I'; 
-        ins.rs1 = (pc >> 15) & 0x1f;
-        ins.rd = (pc >> 7) & 0x1f;
-        ins.imm = (pc >> 20) & 0xfff;
+        ins.rs1 = ((pc >> 15) & 0x1f);
+        ins.rd = ((pc >> 7) & 0x1f);
+        ins.imm = ((pc >> 20) & 0xfff);
          // **Sign Extension for negative numbers**
         if (ins.imm & 0x800) {  // If bit 11 (sign bit) is 1
             ins.imm |= 0xfffff000;  // Extend upper bits with 1s
