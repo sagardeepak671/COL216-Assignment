@@ -185,7 +185,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_executed.rd){
-            if(forwarding)
+            if(forwarding && instruction_decoded.type!='B')
                 instruction_decoded.rs1_value = pipeline.instruction_executed.rs1_value;
             
             else stall=true;
@@ -202,7 +202,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
-            if(forwarding)
+            if(forwarding && instruction_decoded.type!='B')
                 instruction_decoded.rs2_value = pipeline.instruction_executed.rs2_value;
             
             else stall=true;
@@ -290,12 +290,12 @@ void proccessor(bool forwarding, int number_of_cycles,string input_file,string o
         current_cycle_number++;
 
     }
-    for(int i=0;i<ans.size();i++){
-        for(int j=0;j<ans[i].size();j++){
-            cout<<ans[i][j]<<" ";
-        }
-        cout<<endl;
-    }
+    // for(int i=0;i<ans.size();i++){
+    //     for(int j=0;j<ans[i].size();j++){
+    //         cout<<ans[i][j]<<" ";
+    //     }
+    //     cout<<endl;
+    // }
     vector<string> ans_str=extract_second_column();
     prettyPrint(ans_str,ans,number_of_instructions,current_cycle_number);
 
