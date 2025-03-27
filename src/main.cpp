@@ -7,7 +7,8 @@ using namespace std;
 
 bool write_enabled[33]= {false};
 int register_value[33]= {0};
-map<int,int> memory;   // RAM
+// map<int,int> memory;   // RAM
+uint8_t memory[10000];
 vector<vector<int>> ans;
 string input_file_name;
 string output_file_name;

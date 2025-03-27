@@ -1,6 +1,6 @@
 #include "instructions.hpp"
 #include "main.hpp"
-
+#define PRINT_ERR cout << "wrong input" << endl;exit(0);
 
 string func3_func7_check(int pc,int funct3, int funct7){
     int opcode = pc & 0x7f;
@@ -15,7 +15,7 @@ string func3_func7_check(int pc,int funct3, int funct7){
         else if(funct3 == 0x20 && funct7 == 0x05)  return "sra";
         else if(funct3 == 0x00 && funct7 == 0x06)  return "or";
         else if(funct3 == 0x00 && funct7 == 0x07)  return "and";
-        else{cout << "wrong input" << endl;exit(0);}
+        else{PRINT_ERR}
     }
     else if(opcode == 0x13){     // I type
        if(funct3 == 0x00 )  return "addi";
@@ -26,21 +26,21 @@ string func3_func7_check(int pc,int funct3, int funct7){
        else if(funct3 == 0x07 )  return "andi";
        else if(funct3 == 0x01 )  return "slli";
        else if(funct3 == 0x05 )  return "srli";
-       else{cout << "wrong input" << endl;exit(0);}
+       else{PRINT_ERR}
     }else if(opcode == 0x03){     // I-type
        if(funct3 == 0x00 )  return "lb";
        else if(funct3 == 0x01 )  return "lh";
        else if(funct3 == 0x02 )  return "lw";
        else if(funct3 == 0x03 )  return "lbu";
        else if(funct3 == 0x04 )  return "lhu";
-       else{cout << "wrong input" << endl;exit(0);}
+       else if(funct3 == 0x05)  return "lwu";
+       else{PRINT_ERR}
     }   
     else if(opcode == 0x23){     // S type  
        if(funct3 == 0x00 )  return "sb";
        else if(funct3 == 0x01 )  return "sh";
-       else if(funct3 == 0x02 )  return "sw";
-       else if(funct3 == 0x03 )  return "sd";
-       else{cout << "wrong input" << endl;exit(0);}
+       else if(funct3 == 0x02 )  return "sw"; 
+       else{PRINT_ERR}
     }
     else if(opcode == 0x63){ //B-type 
        if(funct3 == 0x00 )  return "beq";
@@ -49,94 +49,118 @@ string func3_func7_check(int pc,int funct3, int funct7){
        else if(funct3 == 0x05 )  return "bge";
        else if(funct3 == 0x06 )  return "bltu";
        else if(funct3 == 0x07 )  return "bgeu";
-       else{cout << "wrong input" << endl;exit(0);}
+       else{PRINT_ERR}
     }
-    else if(opcode == 0x37 && funct3 == 0x00 )  return "lui";  
-    else if(opcode == 0x17 && funct3 == 0x01 ) return "auipc"; 
+    else if(opcode == 0x37 && funct3 == 0x00 )  return "lui";   
     else if(opcode == 0x6f && funct3 == 0x00 ) return "jal";  
     else if(opcode == 0x67 && funct3 == 0x00 )  return "jalr"; 
+    else {PRINT_ERR}
     return "";
 }
 
-
 void update_register_value(instruction &ins) { 
-    if(ins.type == 'R') { 
-        register_value[ins.rd] = ins.result;
-    }
-    else if(ins.type == 'I') {
-        if(ins.opcode == "lb" || ins.opcode == "lh" || ins.opcode == "lw" || ins.opcode == "lbu" || ins.opcode == "lhu")return;
-        register_value[ins.rd] = ins.result;
-
-    }
-    else if(ins.type == 'U') {
-        register_value[ins.rd] = ins.result;
-    }
+    if(ins.type == 'R' || ins.type == 'I' || ins.type == 'U')  register_value[ins.rd] = ins.result; 
 }
 
-void memory_access(instruction &ins){
-    if(ins.type == 'I'){
-        if(ins.opcode == "lb" || ins.opcode == "lbu" || ins.opcode == "lh" || ins.opcode == "lhu" || ins.opcode == "lw") ins.result = memory[ins.result];
+void memory_access(instruction &ins) { 
+    uint32_t addr = ins.result; 
+    if(ins.type == 'I') { 
+        if(ins.opcode == "lb") { 
+            int8_t byteVal = static_cast<int8_t>(memory[addr]);
+            ins.result = static_cast<int32_t>(byteVal);
+        }
+        else if(ins.opcode == "lbu") { 
+            uint8_t byteVal = memory[addr];
+            ins.result = static_cast<uint32_t>(byteVal);
+        }
+        else if(ins.opcode == "lh") { 
+            int16_t half = static_cast<int16_t>(memory[addr] | (memory[addr+1] << 8));
+            ins.result = static_cast<int32_t>(half);
+        }
+        else if(ins.opcode == "lhu") { 
+            uint16_t half = static_cast<uint16_t>(memory[addr] | (memory[addr+1] << 8));
+            ins.result = static_cast<uint32_t>(half);
+        }
+        else if(ins.opcode == "lw") { 
+            int32_t word = static_cast<int32_t>(
+                memory[addr]        |
+                (memory[addr+1] << 8) |
+                (memory[addr+2] << 16) |
+                (memory[addr+3] << 24)
+            );
+            ins.result = word;
+        } else if(ins.opcode == "lwu") {
+            uint32_t word = static_cast<uint32_t>(
+                memory[addr]        |
+                (memory[addr+1] << 8) | 
+                (memory[addr+2] << 16) |
+                (memory[addr+3] << 24)
+            );
+            ins.result = word;
+        }
     }
-    else if(ins.type == 'S'){
-        if(ins.opcode == "sb" || ins.opcode == "sh" || ins.opcode == "sw" || ins.opcode == "sd") memory[ins.imm] = ins.result;  
-    }    
+    else if(ins.type == 'S') { 
+        if(ins.opcode == "sb") { 
+            memory[addr] = ins.rs1_value & 0xFF;
+        }
+        else if(ins.opcode == "sh") { 
+            memory[addr]   = ins.rs1_value & 0xFF;
+            memory[addr+1] = (ins.rs1_value >> 8) & 0xFF;
+        }
+        else if(ins.opcode == "sw") { 
+            memory[addr]   = ins.rs1_value & 0xFF;
+            memory[addr+1] = (ins.rs1_value >> 8) & 0xFF;
+            memory[addr+2] = (ins.rs1_value >> 16) & 0xFF;
+            memory[addr+3] = (ins.rs1_value >> 24) & 0xFF;
+        } 
+    }
 }
 
 int execute(instruction &ins){
     if(ins.type == 'R') { 
-        if(ins.opcode == "add") return ins.rs1_value + ins.rs2_value;
+        if(ins.opcode == "add")      return ins.rs1_value + ins.rs2_value;
         else if(ins.opcode == "sub") return ins.rs1_value - ins.rs2_value;
         else if(ins.opcode == "sll") return ins.rs1_value << ins.rs2_value;
         else if(ins.opcode == "slt") return (ins.rs1_value < ins.rs2_value) ? 1 : 0;
-        else if(ins.opcode == "sltu") return (ins.rs1_value < ins.rs2_value) ? 1 : 0;
+        else if(ins.opcode == "sltu") return (static_cast<unsigned>(ins.rs1_value) < static_cast<unsigned>(ins.rs2_value)) ? 1 : 0;
         else if(ins.opcode == "xor") return ins.rs1_value ^ ins.rs2_value;
-        else if(ins.opcode == "srl") return ins.rs1_value >> ins.rs2_value;
-        else if(ins.opcode == "sra") return ins.rs1_value >> ins.rs2_value;
-        else if(ins.opcode == "or") return ins.rs1_value | ins.rs2_value;
+        else if(ins.opcode == "srl") return static_cast<unsigned>(ins.rs1_value) >> ins.rs2_value;
+        else if(ins.opcode == "sra") return ins.rs1_value >> ins.rs2_value; 
+        else if(ins.opcode == "or")  return ins.rs1_value | ins.rs2_value;
+        else if(ins.opcode == "and") return ins.rs1_value & ins.rs2_value;
     }
     else if(ins.type == 'I') {
-        if(ins.opcode == "addi") return ins.rs1_value + ins.imm;
-        else if(ins.opcode == "slti") return (ins.rs1_value < ins.imm) ? 1 : 0;
-        else if(ins.opcode == "sltiu") return (ins.rs1_value < ins.imm) ? 1 : 0;
-        else if(ins.opcode == "xori") return ins.rs1_value ^ ins.imm;
-        else if(ins.opcode == "ori") return ins.rs1_value | ins.imm;
-        else if(ins.opcode == "andi") return ins.rs1_value & ins.imm;
-        else if(ins.opcode == "slli") return ins.rs1_value << ins.imm;
-        else if(ins.opcode == "srli") return ins.rs1_value >> ins.imm;
-        else if(ins.opcode == "srai") return ins.rs1_value >> ins.imm;
-        else if(ins.opcode == "lb") return ins.rs1_value+ins.imm;
-        else if(ins.opcode == "lh") return ins.rs1_value+ins.imm;
-        else if(ins.opcode == "lw") return ins.rs1_value+ins.imm;
-        else if(ins.opcode == "lbu") return ins.rs1_value+ins.imm;
-        else if(ins.opcode == "lhu") return ins.rs1_value+ins.imm;
-        else if(ins.opcode == "lwu") return ins.rs1_value+ins.imm;
-        else if(ins.opcode == "ld") return ins.rs1_value+ins.imm; 
-
+        if(ins.opcode == "addi")  return ins.rs1_value + ins.imm;
+        else if(ins.opcode == "slti")  return (ins.rs1_value < ins.imm) ? 1 : 0;
+        else if(ins.opcode == "sltiu") return (static_cast<unsigned>(ins.rs1_value) < static_cast<unsigned>(ins.imm)) ? 1 : 0;
+        else if(ins.opcode == "xori")  return ins.rs1_value ^ ins.imm;
+        else if(ins.opcode == "ori")   return ins.rs1_value | ins.imm;
+        else if(ins.opcode == "andi")  return ins.rs1_value & ins.imm;
+        else if(ins.opcode == "slli")  return ins.rs1_value << ins.imm;
+        else if(ins.opcode == "srli")  return static_cast<unsigned>(ins.rs1_value) >> ins.imm;
+        else if(ins.opcode == "srai")  return ins.rs1_value >> ins.imm; 
+        else if(ins.opcode == "lb"   || ins.opcode == "lbu" ||ins.opcode == "lh"   || ins.opcode == "lhu" ||
+                ins.opcode == "lw"   || ins.opcode == "lwu" )
+            return ins.rs1_value + ins.imm;
     }
     else if(ins.type == 'S') {
-        if(ins.opcode == "sb") return ins.rs2_value;
-        else if(ins.opcode == "sh") return ins.rs2_value;
-        else if(ins.opcode == "sw") return ins.rs2_value;
-        else if(ins.opcode == "sd") return ins.rs2_value;
+        return ins.rs1_value + ins.imm;
     }
     else if(ins.type == 'U') {
-        if(ins.opcode == "lui") return ins.imm;
-        else if(ins.opcode == "auipc") return ins.imm + ins.imm; 
+        if(ins.opcode == "lui") return ins.imm; 
     }
     return 0;
 }
 
 bool manage_branch(instruction &ins){
-        if(ins.opcode == "beq" && register_value[ins.rs1] == register_value[ins.rs2]){return true; }
-        else if(ins.opcode == "bne" && register_value[ins.rs1] != register_value[ins.rs2]){ return true; }
-        else if(ins.opcode == "blt" && register_value[ins.rs1] < register_value[ins.rs2]){ return true; }
-        else if(ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2]){ return true; }
-        else if(ins.opcode == "bltu" && register_value[ins.rs1] < register_value[ins.rs2]){ return true; }
-        else if(ins.opcode == "bgeu" && register_value[ins.rs1] >= register_value[ins.rs2]){ return true; }
-        cout<<"no taking branch"<<endl;
-        return false;
+    if (ins.opcode == "beq" && register_value[ins.rs1] == register_value[ins.rs2])return true;
+    else if (ins.opcode == "bne" && register_value[ins.rs1] != register_value[ins.rs2])return true;
+    else if (ins.opcode == "blt" && register_value[ins.rs1] < register_value[ins.rs2])return true;
+    else if (ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2])return true;
+    else if (ins.opcode == "bltu" && static_cast<unsigned int>(register_value[ins.rs1]) < static_cast<unsigned int>(register_value[ins.rs2]))return true;
+    else if (ins.opcode == "bgeu" && static_cast<unsigned int>(register_value[ins.rs1]) >= static_cast<unsigned int>(register_value[ins.rs2]))return true; 
+    return false; 
 }
-
 
 int binarystring_to_decimalint(string binary_format){
     int an = 0;
@@ -146,7 +170,7 @@ int binarystring_to_decimalint(string binary_format){
     return an;
 } 
 
-
+// processing the machine code instruction to form the struct
 instruction process_instruction(string input_format){ 
     // first converting input_format to binary string
     string binary_format;
@@ -154,7 +178,7 @@ instruction process_instruction(string input_format){
         if(c >= '0' && c <= '9') { binary_format += HEX_TO_BIN[c - '0'];}
         else if(c >= 'a' && c <= 'f') {binary_format += HEX_TO_BIN[c - 'a' + 10];}
         else if(c >= 'A' && c <= 'F') {binary_format += HEX_TO_BIN[c - 'A' + 10];}
-        else {cout << "wrong input" << endl;exit(0);}
+        else {PRINT_ERR}
     }  
     int pc = binarystring_to_decimalint(binary_format); 
     // extracting opcode rd,rs1,rs2,imm  
@@ -177,7 +201,7 @@ instruction process_instruction(string input_format){
         ins.rs1 = ((pc >> 15) & 0x1f);
         ins.rd = ((pc >> 7) & 0x1f);
         ins.imm = ((pc >> 20) & 0xfff);
-         // Sign Extension for negative numbers
+         // Sign Extension for -ve numbers
         if (ins.imm & 0x800) {  // If bit 11 (sign bit) is 1
             ins.imm |= 0xfffff000;  // Extend upper bits with 1s
         }
@@ -189,10 +213,9 @@ instruction process_instruction(string input_format){
         ins.type = 'I';
         ins.rs1 = (pc >> 15) & 0x1f;
         ins.rd = (pc >> 7) & 0x1f;
-        ins.imm = (pc >> 20) & 0xfff;
-         // Sign Extension for negative numbers
-        if (ins.imm & 0x800) {  // If bit 11 (sign bit) is 1
-            ins.imm |= 0xfffff000;  // Extend upper bits with 1s
+        ins.imm = (pc >> 20) & 0xfff; 
+        if (ins.imm & 0x800) {   
+            ins.imm |= 0xfffff000;  
         }
         ins.funct3 = (pc >> 12) & 0x7;
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
@@ -204,10 +227,9 @@ instruction process_instruction(string input_format){
         ins.rs1 = (pc >> 15) & 0x1f;
         ins.rs2 = (pc >> 20) & 0x1f;
         ins.imm = ((pc >> 25) & 0x7f) << 5 | ((pc >> 7) & 0x1f);
-        ins.funct3 = (pc >> 12) & 0x7;
-        // Sign Extension for negative values
-        if (ins.imm & 0x800) {  // If bit 11 (sign bit) is 1
-            ins.imm |= 0xfffff000;  // Extend upper bits with 1s
+        ins.funct3 = (pc >> 12) & 0x7; 
+        if (ins.imm & 0x800) {   
+            ins.imm |= 0xfffff000;  
         }
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
     }
@@ -220,10 +242,9 @@ instruction process_instruction(string input_format){
                   ((pc >> 7) & 0x1) << 11 |
                   ((pc >> 25) & 0x3f) << 5 |
                   ((pc >> 8) & 0xf) << 1;
-        ins.funct3 = (pc >> 12) & 0x7;
-         // Sign Extension for negative values
-            if (ins.imm & 0x1000) {  // If bit 12 (sign bit) is 1
-                ins.imm |= 0xffffe000;  // Extend upper bits with 1s
+        ins.funct3 = (pc >> 12) & 0x7; 
+            if (ins.imm & 0x1000) {   
+                ins.imm |= 0xffffe000;   
             }
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
     }
@@ -231,10 +252,9 @@ instruction process_instruction(string input_format){
         //| imm[31:12] (20 bits) | rd (5 bits) | opcode (7 bits) |
         ins.type = 'U';
         ins.rd = (pc >> 7) & 0x1f;
-        ins.imm = (pc >> 12) & 0xfffff;
-        // Sign extend to 32-bit if needed
+        ins.imm = (pc >> 12) & 0xfffff; 
          if (ins.imm & 0x80000000) {  
-            ins.imm |= 0xfff00000;  // Fill upper 12 bits with 1s
+            ins.imm |= 0xfff00000;   
         }
 
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
@@ -244,7 +264,7 @@ instruction process_instruction(string input_format){
         ins.rd = (pc >> 7) & 0x1f;
         ins.imm = (pc >> 12) & 0xfffff;
         if (ins.imm & 0x80000000) {  
-        ins.imm |= 0xfff00000;  // Fill upper bits with 1s
+        ins.imm |= 0xfff00000;   
         }   
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
     }
@@ -255,10 +275,9 @@ instruction process_instruction(string input_format){
         ins.imm = ((pc >> 31) & 0x1) << 20 |
                   ((pc >> 12) & 0xff) << 12 |
                   ((pc >> 20) & 0x1) << 11 |
-                  ((pc >> 21) & 0x3ff) << 1;
-            // Sign-extend immediate to 32-bit signed int
-        if (ins.imm & (1 << 20)) { // If sign bit (bit 20) is set
-        ins.imm |= 0xFFF00000;  // Extend the sign to bits 31-21
+                  ((pc >> 21) & 0x3ff) << 1; 
+        if (ins.imm & (1 << 20)) {  
+        ins.imm |= 0xFFF00000;   
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
     }
     }
@@ -267,31 +286,26 @@ instruction process_instruction(string input_format){
         ins.type = 'I';
         ins.rs1 = (pc >> 15) & 0x1f;
         ins.rd = (pc >> 7) & 0x1f;
-        ins.imm = (pc >> 20) & 0xfff;
-        // **Sign Extension for Negative Values**
-        if (ins.imm & 0x800) {  // If bit 11 (imm[11]) is 1
-            ins.imm |= 0xfffff000;  // Extend upper bits with 1s
+        ins.imm = (pc >> 20) & 0xfff; 
+        if (ins.imm & 0x800) {   
+            ins.imm |= 0xfffff000;   
         }
         ins.funct3 = (pc >> 12) & 0x7;
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
     }
-    else{
-        cout << "wrong input" << endl;
-        exit(0);
-    }  
+    else{PRINT_ERR}  
     return ins;
 }
 
+// to get the expression like add x1 x0 0 from the instruction struct
 string get_expression(instruction &ins){
     if(ins.type == 'R')return ins.opcode + " x"+ to_string(ins.rd) + " x"+ to_string(ins.rs1) + " x"+ to_string(ins.rs2) ;
-
     else if(ins.type == 'I') {
         if(ins.opcode == "lb" || ins.opcode == "lh" || ins.opcode == "lw" || ins.opcode == "lbu" || ins.opcode == "lhu")
             return ins.opcode + " x"+ to_string(ins.rd) + " " + to_string(ins.imm) +  " x"+ to_string(ins.rs1) ;
         else
             return ins.opcode + " x"+ to_string(ins.rd) + " x"+ to_string(ins.rs1) + " " + to_string(ins.imm) ;
     }
-
     else if(ins.type == 'S')return ins.opcode + " x"+ to_string(ins.rs2)  + " " + to_string(ins.imm)+ " x"+ to_string(ins.rs1);
     else if(ins.type == 'B') return ins.opcode + " x"+ to_string(ins.rs1) + " x"+ to_string(ins.rs2) + " " + to_string(ins.imm);
     else if(ins.type == 'U')return ins.opcode + " x"+ to_string(ins.rd) + " " + to_string(ins.imm);
