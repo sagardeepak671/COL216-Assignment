@@ -215,8 +215,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     return stall;
 }
 
-void flush(pipeline_stage pipeline){
-    if(pipeline.pc_address!=pipeline.IF_instruction_number)
+void flush(pipeline_stage &pipeline){
     pipeline.IF_instruction_number=-1;
 }
 
@@ -256,12 +255,15 @@ void compute(pipeline_stage &pipeline,bool forwarding){
         cout<<"instruction decoded: "<<instruction_decoded.opcode<<" "<<(int)instruction_decoded.rd<<"-"<<(int)instruction_decoded.rs1<<" "<<(int)instruction_decoded.rs2<<endl;
         stall = get_rs_values(pipeline,instruction_decoded,forwarding);
         //by default branch not taken
-        // if(instruction_decoded.type == 'B'){
-        //     // jump = manage_branch(instruction_decoded);    
-        // }
+        if(instruction_decoded.type == 'B'){
+            jump = manage_branch(instruction_decoded);    
+            if(jump!=1){
+                flush(pipeline);
+            }
+        }
         if(instruction_decoded.type == 'J'){
             jump = instruction_decoded.imm/4 - 1;
-            pipeline.IF_instruction_number=-1;
+            flush(pipeline);
         }
         if(stall)jump=0;
         cout<<"jump: "<<jump<<endl;

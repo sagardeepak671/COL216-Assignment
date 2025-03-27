@@ -133,7 +133,7 @@ int manage_branch(instruction &ins){
         else if(ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2]){ return ins.imm/4; }
         else if(ins.opcode == "bltu" && register_value[ins.rs1] < register_value[ins.rs2]){ return ins.imm/4; }
         else if(ins.opcode == "bgeu" && register_value[ins.rs1] >= register_value[ins.rs2]){ return ins.imm/4; }
-        return 0;
+        return 1;
 }
 
 
