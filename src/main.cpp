@@ -7,7 +7,7 @@ using namespace std;
 // bool write_enabled[33]= {false};
 int register_value[33]= {0};
 // map<int,int> memory;   // RAM
-uint8_t memory[10000];
+uint8_t memory[10000]; 
 vector<vector<int>> ans;
 string input_file_name;
 string output_file_name;
@@ -70,13 +70,14 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     if(instruction_decoded.rs1!=32 ){
         if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_decoded.rd){
             if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu" && instruction_decoded.type!='B'))
-                instruction_decoded.rs1_value = pipeline.instruction_decoded.rs1_value;
+                instruction_decoded.rs1_value = pipeline.instruction_decoded.result;
                 
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_executed.rd){
+            cout<<"here"<<endl;
             if(forwarding)
-                instruction_decoded.rs1_value = pipeline.instruction_executed.rs1_value;
+                instruction_decoded.rs1_value = pipeline.instruction_executed.result;
             
             else stall=true;
         }
@@ -87,13 +88,13 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     if(instruction_decoded.rs2!=32 ){
         if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
             if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu" && instruction_decoded.type!='B'))
-                instruction_decoded.rs2_value = pipeline.instruction_executed.rs2_value;
+                instruction_decoded.rs2_value = pipeline.instruction_executed.result;
                 
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
             if(forwarding)
-                instruction_decoded.rs2_value = pipeline.instruction_executed.rs2_value;
+                instruction_decoded.rs2_value = pipeline.instruction_executed.result;
             
             else stall=true;
         }
@@ -131,6 +132,7 @@ void compute(pipeline_stage &pipeline,bool forwarding){
         cout<<"memory access instruction: "<<pipeline.instruction_executed.opcode<<" "<<(int)pipeline.instruction_executed.rd<<" "<<(int)pipeline.instruction_executed.rs1<<" "<<(int)pipeline.instruction_executed.rs2<<endl;
         cout<<"address"<<pipeline.instruction_executed.result<<endl;
         memory_access(pipeline.instruction_executed);
+        cout<<"memory aca"<<(int)pipeline.instruction_executed.result<<endl;
     }
 
     if(pipeline.EX_instruction_number != -1){
@@ -148,6 +150,7 @@ void compute(pipeline_stage &pipeline,bool forwarding){
         stall = get_rs_values(pipeline,instruction_decoded,forwarding);
         //by default branch not taken
         if(instruction_decoded.type == 'B'){
+            cout<<"lol"<<instruction_decoded.rs1_value<<endl;
             bool take_branch= manage_branch(instruction_decoded);   
             if(take_branch){
                 flush(pipeline);
@@ -187,6 +190,8 @@ void compute(pipeline_stage &pipeline,bool forwarding){
 
 
 void proccessor(bool forwarding, int number_of_cycles,string input_file,string output_file){
+    memory[6] = 4;
+    memory[0] = 4;
     input_file_name = input_file;
     output_file_name = output_file;
     int current_cycle_number=0;

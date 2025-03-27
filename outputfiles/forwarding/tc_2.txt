@@ -1,0 +1,4 @@
+lw x6 0 x6          -> IF ;ID ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
+jalr x0 x6 4        ->    ;IF ;ID ; - ;IF /EX;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;ID /MEM;IF /EX/WB;
+addi x5 x5 1        ->    ;   ;IF ; - ;   ;IF ;   ;IF ;   ;IF ;   ;IF ;   ;IF ;   ;IF ;   ;IF ;   ;IF ;   ;IF ;   ;IF ;   ;
+addi x10 x5 0       ->    ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;

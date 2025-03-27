@@ -52,9 +52,9 @@ string func3_func7_check(int pc,int funct3, int funct7){
         if(funct3 == 0x07 )  return "bgeu";
         PRINT_ERR
     }
-    if(opcode == 0x37 && funct3 == 0x00 )  return "lui";   
-    if(opcode == 0x6f && funct3 == 0x00 ) return "jal";  
-    if(opcode == 0x67 && funct3 == 0x00 )  return "jalr"; 
+    if(opcode == 0x37 )  return "lui";   
+    if(opcode == 0x6f ) return "jal";  
+    if(opcode == 0x67 )  return "jalr"; 
     PRINT_ERR
     return "";
 }
@@ -157,12 +157,13 @@ int get_jump(instruction &ins){
 }
 
 bool manage_branch(instruction &ins){
-    if (ins.opcode == "beq" && register_value[ins.rs1] == register_value[ins.rs2])return true;
-    if (ins.opcode == "bne" && register_value[ins.rs1] != register_value[ins.rs2])return true;
-    if (ins.opcode == "blt" && register_value[ins.rs1] < register_value[ins.rs2])return true;
-    if (ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2])return true;
-    if (ins.opcode == "bltu" && static_cast<unsigned int>(register_value[ins.rs1]) < static_cast<unsigned int>(register_value[ins.rs2]))return true;
-    if (ins.opcode == "bgeu" && static_cast<unsigned int>(register_value[ins.rs1]) >= static_cast<unsigned int>(register_value[ins.rs2]))return true; 
+    cout<<ins.rs1_value<<" "<<ins.rs2_value<<endl;
+    if (ins.opcode == "beq" && ins.rs1_value == ins.rs2_value)return true;
+    if (ins.opcode == "bne" && ins.rs1_value != ins.rs2_value)return true;
+    if (ins.opcode == "blt" && ins.rs1_value < ins.rs2_value)return true;
+    if (ins.opcode == "bge" && ins.rs1_value >= ins.rs2_value)return true;
+    if (ins.opcode == "bltu" && static_cast<unsigned int>(ins.rs1_value) < static_cast<unsigned int>(ins.rs2_value))return true;
+    if (ins.opcode == "bgeu" && static_cast<unsigned int>(ins.rs1_value) >= static_cast<unsigned int>(ins.rs2_value))return true; 
     return false; 
 }
 
