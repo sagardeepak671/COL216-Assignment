@@ -22,7 +22,7 @@ void update_register_value(instruction &ins);
 string func3_func7_check(int pc,int funct3, int funct7);
 instruction process_instruction(string input_format);
 string get_expression(instruction &ins);
-int manage_branch(instruction &ins);
+bool manage_branch(instruction &ins);
 int execute(instruction &ins);
 void memory_access(instruction &ins);
 

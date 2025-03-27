@@ -256,9 +256,10 @@ void compute(pipeline_stage &pipeline,bool forwarding){
         stall = get_rs_values(pipeline,instruction_decoded,forwarding);
         //by default branch not taken
         if(instruction_decoded.type == 'B'){
-            jump = manage_branch(instruction_decoded) -1;    
-            if(jump!=1){
+            bool take_branch= manage_branch(instruction_decoded);   
+            if(take_branch){
                 flush(pipeline);
+                jump=instruction_decoded.imm/4 - 1;
             }
         }
         if(instruction_decoded.type == 'J'){

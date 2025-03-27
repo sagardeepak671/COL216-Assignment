@@ -126,14 +126,15 @@ int execute(instruction &ins){
     return 0;
 }
 
-int manage_branch(instruction &ins){
-        if(ins.opcode == "beq" && register_value[ins.rs1] == register_value[ins.rs2]){return ins.imm/4; }
-        else if(ins.opcode == "bne" && register_value[ins.rs1] != register_value[ins.rs2]){ return ins.imm/4; }
-        else if(ins.opcode == "blt" && register_value[ins.rs1] < register_value[ins.rs2]){ return ins.imm/4; }
-        else if(ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2]){ return ins.imm/4; }
-        else if(ins.opcode == "bltu" && register_value[ins.rs1] < register_value[ins.rs2]){ return ins.imm/4; }
-        else if(ins.opcode == "bgeu" && register_value[ins.rs1] >= register_value[ins.rs2]){ return ins.imm/4; }
-        return 1;
+bool manage_branch(instruction &ins){
+        if(ins.opcode == "beq" && register_value[ins.rs1] == register_value[ins.rs2]){return true; }
+        else if(ins.opcode == "bne" && register_value[ins.rs1] != register_value[ins.rs2]){ return true; }
+        else if(ins.opcode == "blt" && register_value[ins.rs1] < register_value[ins.rs2]){ return true; }
+        else if(ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2]){ return true; }
+        else if(ins.opcode == "bltu" && register_value[ins.rs1] < register_value[ins.rs2]){ return true; }
+        else if(ins.opcode == "bgeu" && register_value[ins.rs1] >= register_value[ins.rs2]){ return true; }
+        cout<<"no taking branch"<<endl;
+        return false;
 }
 
 
