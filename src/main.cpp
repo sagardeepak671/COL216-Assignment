@@ -185,7 +185,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_executed.rd){
-            if(forwarding && instruction_decoded.type!='B')
+            if(forwarding)
                 instruction_decoded.rs1_value = pipeline.instruction_executed.rs1_value;
             
             else stall=true;
@@ -202,7 +202,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
-            if(forwarding && instruction_decoded.type!='B')
+            if(forwarding)
                 instruction_decoded.rs2_value = pipeline.instruction_executed.rs2_value;
             
             else stall=true;
@@ -256,7 +256,7 @@ void compute(pipeline_stage &pipeline,bool forwarding){
         stall = get_rs_values(pipeline,instruction_decoded,forwarding);
         //by default branch not taken
         if(instruction_decoded.type == 'B'){
-            jump = manage_branch(instruction_decoded);    
+            jump = manage_branch(instruction_decoded) -1;    
             if(jump!=1){
                 flush(pipeline);
             }
