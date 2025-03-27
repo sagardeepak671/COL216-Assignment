@@ -1,2 +1,0 @@
-sb,sh,sw ka defn dekh lena
-change readline func to read only the first column of line
