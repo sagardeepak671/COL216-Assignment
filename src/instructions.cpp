@@ -312,3 +312,8 @@ string get_expression(instruction &ins){
     else if(ins.type == 'J')return ins.opcode + " x"+ to_string(ins.rd) + ", " + to_string(ins.imm);
     return "";
 }
+
+bool load_opcode(string opcode){
+    if(opcode == "lb" || opcode == "lh" || opcode == "lw" || opcode == "lbu" || opcode == "lhu")return true;
+    return false;
+}

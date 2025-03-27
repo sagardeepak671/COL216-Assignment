@@ -181,7 +181,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     bool stall=false;
     if(instruction_decoded.rs1!=32 ){
         if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_decoded.rd){
-            if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu" && instruction_decoded.type!='B'))
+            if(forwarding &&( !load_opcode(pipeline.instruction_decoded.opcode) && instruction_decoded.type!='B'))
                 instruction_decoded.rs1_value = pipeline.instruction_decoded.rs1_value;
                 
             else stall=true;
@@ -198,7 +198,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     }
     if(instruction_decoded.rs2!=32 ){
         if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
-            if(forwarding &&( pipeline.instruction_decoded.opcode!="ld" && pipeline.instruction_decoded.opcode!="lw" && pipeline.instruction_decoded.opcode!="lbu" && pipeline.instruction_decoded.opcode!="lhu" && instruction_decoded.type!='B'))
+            if(forwarding &&( !load_opcode(pipeline.instruction_decoded.opcode) && instruction_decoded.type!='B'))
                 instruction_decoded.rs2_value = pipeline.instruction_executed.rs2_value;
                 
             else stall=true;

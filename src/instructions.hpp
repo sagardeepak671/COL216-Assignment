@@ -25,6 +25,6 @@ string get_expression(instruction &ins);
 bool manage_branch(instruction &ins);
 int execute(instruction &ins);
 void memory_access(instruction &ins);
-
+bool load_opcode(string opcode);
 
 #endif
