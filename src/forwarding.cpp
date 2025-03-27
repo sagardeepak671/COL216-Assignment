@@ -11,10 +11,17 @@ int main(int argc, char* argv[]) {
     }
 
     string input_file_name = argv[1];
-    string output_file_name = "output_forwarding.txt";
+    string file_name="";
+    for(int i=13;i<input_file_name.length();i++){
+        file_name+=input_file_name[i];
+    }
+    cout<<file_name<<endl;
+    string output_file_name = "./outputfiles/forwarding/"+file_name;
 
     int number_of_cycles = 25;
     proccessor(true, number_of_cycles,input_file_name,output_file_name);
+    cout<<file_name<<endl;
+    cout<<output_file_name<<endl;
     return 0;
 }
 

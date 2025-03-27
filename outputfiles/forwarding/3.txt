@@ -1,0 +1,2 @@
+add x6 x5 x5        -> IF ;ID ;EX ;MEM;IF /WB;ID ;EX ;MEM;IF /WB;ID ;EX ;MEM;IF /WB;ID ;EX ;MEM;IF /WB;ID ;EX ;MEM;IF /WB;ID ;EX ;MEM;IF /WB;
+beq x6 x5 -4        ->    ;IF ;ID ; - ;EX ;IF /MEM;ID /WB;ID ;EX ;IF /MEM;ID /WB;ID ;EX ;IF /MEM;ID /WB;ID ;EX ;IF /MEM;ID /WB;ID ;EX ;IF /MEM;ID /WB;ID ;EX ;

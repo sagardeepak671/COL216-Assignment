@@ -113,18 +113,20 @@ void prettyPrint(vector<string> commands, vector<vector<int>>& stages,int number
             }
         }
     }  
+    ofstream output_file(output_file_name);
     for(int i=0;i<number_of_instructions;i++){
-        cout<<left<<setw(20)<<commands[i]<<"-> ";
+        output_file<<left<<setw(20)<<commands[i]<<"-> ";
         for(int j=0;j<number_of_cycles;j++){
             if(j>1 && tokens[i][j]!="   " && tokens[i][j-1]==tokens[i][j]){
-                cout<<" - "<<";";
+                output_file<<" - "<<";";
             }
             else{
-                cout<<tokens[i][j]<<";";
+                output_file<<tokens[i][j]<<";";
             }
         }
-        cout<<endl;
+        output_file<<endl;
     }
+    output_file.close();
 }
 
 
