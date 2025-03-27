@@ -67,6 +67,8 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
     //stores the rs values in instuction_decoded struct
     //returns true if stall needed
     bool stall=false;
+    cout<<"here"<<endl;
+    cout<<(int)instruction_decoded.rs1<<" "<<(int)instruction_decoded.rs2<<" "<<(int)pipeline.instruction_decoded.rd<<" "<<(int)pipeline.instruction_executed.rd<<endl;
     if(instruction_decoded.rs1!=32 ){
         if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_decoded.rd){
             if(forwarding &&( !load_opcode(pipeline.instruction_decoded.opcode) && instruction_decoded.type!='B'))
@@ -75,9 +77,11 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_executed.rd){
-            cout<<"here"<<endl;
-            if(forwarding && instruction_decoded.type!='B')
-                instruction_decoded.rs1_value = pipeline.instruction_executed.result;
+            if(forwarding )
+                if(instruction_decoded.type=='B' && load_opcode(pipeline.instruction_executed.opcode))
+                    stall=true;
+                else
+                    instruction_decoded.rs1_value = pipeline.instruction_executed.result;
             
             else stall=true;
         }
@@ -85,16 +89,21 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             instruction_decoded.rs1_value = register_value[instruction_decoded.rs1];
         }
     }
+    if(instruction_decoded.rs1==0)stall=false;
+    if(stall)return true;
     if(instruction_decoded.rs2!=32 ){
-        if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
+        if(pipeline.EX_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_decoded.rd){
             if(forwarding &&( !load_opcode(pipeline.instruction_decoded.opcode) && instruction_decoded.type!='B'))
-                instruction_decoded.rs2_value = pipeline.instruction_executed.result;
+                instruction_decoded.rs2_value = pipeline.instruction_decoded.result;
                 
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
-            if(forwarding && instruction_decoded.type!='B') 
-                instruction_decoded.rs2_value = pipeline.instruction_executed.result;
+            if(forwarding)
+                if(instruction_decoded.type=='B' && load_opcode(pipeline.instruction_executed.opcode))
+                    stall=true;
+                else
+                    instruction_decoded.rs2_value = pipeline.instruction_executed.result;
             
             else stall=true;
         }
@@ -102,7 +111,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             instruction_decoded.rs2_value = register_value[instruction_decoded.rs2];
         }
     }
-    cout<< " stall for instruction: "<<instruction_decoded.opcode<<" "<<instruction_decoded.rd<<" "<<instruction_decoded.rs1<<" "<<instruction_decoded.rs2<<" is "<<stall<<endl;
+    if(instruction_decoded.rs2==0)stall=false;
     return stall;
 }
 
@@ -120,37 +129,26 @@ void compute(pipeline_stage &pipeline,bool forwarding){
 
 
     ans.push_back({pipeline.IF_instruction_number,pipeline.ID_instruction_number,pipeline.EX_instruction_number,pipeline.MEM_instruction_number,pipeline.WB_instruction_number});
-    // cout<<"IF"<<" "<<"ID"<<" "<<"EX"<<" "<<"MEM"<<" "<<"WB"<<endl;
-    // cout<<pipeline.IF_instruction_number<<"  "<<pipeline.ID_instruction_number<<"  "<<pipeline.EX_instruction_number<<"  "<<pipeline.MEM_instruction_number<<"  "<<pipeline.WB_instruction_number<<endl;
+
 
     if(pipeline.WB_instruction_number != -1){
-        cout<<"updating register value for instruction: "<<pipeline.instruction_memory_accessed.opcode<<" "<<pipeline.instruction_memory_accessed.rd<<" "<<pipeline.instruction_memory_accessed.rs1<<" "<<pipeline.instruction_memory_accessed.rs2<<endl;
         update_register_value(pipeline.instruction_memory_accessed); 
     }
 
     if(pipeline.MEM_instruction_number != -1){
-        cout<<"memory access instruction: "<<pipeline.instruction_executed.opcode<<" "<<(int)pipeline.instruction_executed.rd<<" "<<(int)pipeline.instruction_executed.rs1<<" "<<(int)pipeline.instruction_executed.rs2<<endl;
-        cout<<"address"<<pipeline.instruction_executed.result<<endl;
         memory_access(pipeline.instruction_executed);
-        cout<<"memory aca"<<(int)pipeline.instruction_executed.result<<endl;
     }
 
     if(pipeline.EX_instruction_number != -1){
-        cout<<"executing instruction: "<<pipeline.instruction_decoded.opcode<<" "<<(int)pipeline.instruction_decoded.rd<<" "<<(int)pipeline.instruction_decoded.rs1<<" "<<(int)pipeline.instruction_decoded.rs2<<endl;
         int result =execute(pipeline.instruction_decoded);
-        cout<<"result: "<<result<<endl;
         pipeline.instruction_decoded.result = result;
-        cout<< pipeline.instruction_decoded.result<<endl;
     }
 
     if(pipeline.ID_instruction_number != -1){
-        cout<<"decoding instruction: "<<pipeline.instruction_fetched<<endl;
         instruction_decoded = process_instruction(pipeline.instruction_fetched);
-        cout<<"instruction decoded: "<<instruction_decoded.opcode<<" "<<(int)instruction_decoded.rd<<"-"<<(int)instruction_decoded.rs1<<" "<<(int)instruction_decoded.rs2<<(int)instruction_decoded.imm<<endl;
+        cout<<"instuction dec"<<instruction_decoded.opcode<<" "<<(int)instruction_decoded.rd<<" "<<(int)instruction_decoded.rs1<<" "<<(int)instruction_decoded.rs2<<" "<<(int)instruction_decoded.imm<<" "<<(int)instruction_decoded.rs1_value<<" "<<(int)instruction_decoded.rs2_value<<endl;
         stall = get_rs_values(pipeline,instruction_decoded,forwarding);
-        //by default branch not taken
         if(instruction_decoded.type == 'B'){
-            cout<<"lol"<<instruction_decoded.rs1_value<<endl;
             bool take_branch= manage_branch(instruction_decoded);   
             if(take_branch){
                 flush(pipeline);
@@ -163,25 +161,19 @@ void compute(pipeline_stage &pipeline,bool forwarding){
             }else if(instruction_decoded.opcode == "jalr"){
                 // i will get the next target location so jump will be ,, now+jump = get_jump()  => jump = get_jump()-now
                 jump = get_jump(instruction_decoded) - pipeline.pc_address;
-                cout<<get_jump(instruction_decoded)<<"(HAHA)"<<endl;
-                cout<<jump<<endl;
             }
             flush(pipeline);
         }
         if(stall)jump=0;
-        cout<<"jump: "<<jump<<endl;
-        cout<<"stall: "<<stall<<endl;
     }
 
     if(pipeline.IF_instruction_number != -1){
         instruction_fetched = read_line(pipeline.pc_address);
-        cout<<"instruction fetched: "<<instruction_fetched<<endl;
     }
 
     pipeline.pc_address += jump;
 
 
-    cout<<"pc address: "<<pipeline.pc_address<<endl;
     
     push_next_stage(pipeline,instruction_fetched,instruction_decoded,forwarding,stall);
 }
@@ -190,28 +182,17 @@ void compute(pipeline_stage &pipeline,bool forwarding){
 
 
 void proccessor(bool forwarding, int number_of_cycles,string input_file,string output_file){
-    memory[6] = 4;
-    memory[0] = 4;
     input_file_name = input_file;
     output_file_name = output_file;
     int current_cycle_number=0;
     pipeline_stage pipeline;
     number_of_instructions = count_number_of_instructions();
-    cout<<"number of instructions: "<<number_of_instructions<<endl;
     pipeline.IF_instruction_number = 0;
     while(current_cycle_number < number_of_cycles){
-        cout<<"CYCLE NUMBER: "<<current_cycle_number<<endl;
         compute(pipeline,forwarding);
-        cout<<"--------------------------------"<<endl;
         current_cycle_number++;
 
     }
-    // for(int i=0;i<ans.size();i++){
-    //     for(int j=0;j<ans[i].size();j++){
-    //         cout<<ans[i][j]<<" ";
-    //     }
-    //     cout<<endl;
-    // }
     vector<string> ans_str=extract_second_column();
     prettyPrint(ans_str,ans,number_of_instructions,current_cycle_number);
 
