@@ -6,60 +6,62 @@ string func3_func7_check(int pc,int funct3, int funct7){
     int opcode = pc & 0x7f;
     if(opcode == 0x33){ // R-type
         if(funct3 == 0x00 && funct7 == 0x00)  return "add"; 
-        else if(funct3 == 0x20 && funct7 == 0x00)  return "sub"; 
-        else if(funct3 == 0x00 && funct7 == 0x01)  return "sll"; 
-        else if(funct3 == 0x00 && funct7 == 0x02)  return "slt";
-        else if(funct3 == 0x00 && funct7 == 0x03)  return "sltu";
-        else if(funct3 == 0x00 && funct7 == 0x04)  return "xor";
-        else if(funct3 == 0x00 && funct7 == 0x05)  return "srl";
-        else if(funct3 == 0x20 && funct7 == 0x05)  return "sra";
-        else if(funct3 == 0x00 && funct7 == 0x06)  return "or";
-        else if(funct3 == 0x00 && funct7 == 0x07)  return "and";
-        else{PRINT_ERR}
+        if(funct3 == 0x20 && funct7 == 0x00)  return "sub"; 
+        if(funct3 == 0x00 && funct7 == 0x01)  return "sll"; 
+        if(funct3 == 0x00 && funct7 == 0x02)  return "slt";
+        if(funct3 == 0x00 && funct7 == 0x03)  return "sltu";
+        if(funct3 == 0x00 && funct7 == 0x04)  return "xor";
+        if(funct3 == 0x00 && funct7 == 0x05)  return "srl";
+        if(funct3 == 0x20 && funct7 == 0x05)  return "sra";
+        if(funct3 == 0x00 && funct7 == 0x06)  return "or";
+        if(funct3 == 0x00 && funct7 == 0x07)  return "and";
+        PRINT_ERR
     }
-    else if(opcode == 0x13){     // I type
+    if(opcode == 0x13){     // I type
        if(funct3 == 0x00 )  return "addi";
-       else if(funct3 == 0x02 )  return "slti";
-       else if(funct3 == 0x03 )  return "sltiu";
-       else if(funct3 == 0x04 )  return "xori";
-       else if(funct3 == 0x06 )  return "ori";
-       else if(funct3 == 0x07 )  return "andi";
-       else if(funct3 == 0x01 )  return "slli";
-       else if(funct3 == 0x05 )  return "srli";
-       else{PRINT_ERR}
-    }else if(opcode == 0x03){     // I-type
+        if(funct3 == 0x02 )  return "slti";
+        if(funct3 == 0x03 )  return "sltiu";
+        if(funct3 == 0x04 )  return "xori";
+        if(funct3 == 0x06 )  return "ori";
+        if(funct3 == 0x07 )  return "andi";
+        if(funct3 == 0x01 )  return "slli";
+        if(funct3 == 0x05 )  return "srli";
+        PRINT_ERR
+    }
+    if(opcode == 0x03){     // I-type
        if(funct3 == 0x00 )  return "lb";
-       else if(funct3 == 0x01 )  return "lh";
-       else if(funct3 == 0x02 )  return "lw";
-       else if(funct3 == 0x03 )  return "lbu";
-       else if(funct3 == 0x04 )  return "lhu";
-       else if(funct3 == 0x05)  return "lwu";
-       else{PRINT_ERR}
+        if(funct3 == 0x01 )  return "lh";
+        if(funct3 == 0x02 )  return "lw";
+        if(funct3 == 0x03 )  return "lbu";
+        if(funct3 == 0x04 )  return "lhu";
+        if(funct3 == 0x05)  return "lwu";
+        PRINT_ERR
     }   
-    else if(opcode == 0x23){     // S type  
-       if(funct3 == 0x00 )  return "sb";
-       else if(funct3 == 0x01 )  return "sh";
-       else if(funct3 == 0x02 )  return "sw"; 
-       else{PRINT_ERR}
+    if(opcode == 0x23){     // S type  
+        if(funct3 == 0x00 )  return "sb";
+        if(funct3 == 0x01 )  return "sh";
+        if(funct3 == 0x02 )  return "sw"; 
+        PRINT_ERR
     }
-    else if(opcode == 0x63){ //B-type 
-       if(funct3 == 0x00 )  return "beq";
-       else if(funct3 == 0x01 )  return "bne";
-       else if(funct3 == 0x04 )  return "blt";
-       else if(funct3 == 0x05 )  return "bge";
-       else if(funct3 == 0x06 )  return "bltu";
-       else if(funct3 == 0x07 )  return "bgeu";
-       else{PRINT_ERR}
+    if(opcode == 0x63){ //B-type 
+        if(funct3 == 0x00 )  return "beq";
+        if(funct3 == 0x01 )  return "bne";
+        if(funct3 == 0x04 )  return "blt";
+        if(funct3 == 0x05 )  return "bge";
+        if(funct3 == 0x06 )  return "bltu";
+        if(funct3 == 0x07 )  return "bgeu";
+        PRINT_ERR
     }
-    else if(opcode == 0x37 && funct3 == 0x00 )  return "lui";   
-    else if(opcode == 0x6f && funct3 == 0x00 ) return "jal";  
-    else if(opcode == 0x67 && funct3 == 0x00 )  return "jalr"; 
-    else {PRINT_ERR}
+    if(opcode == 0x37 )  return "lui";   
+    if(opcode == 0x6f ) return "jal";  
+    if(opcode == 0x67 )  return "jalr"; 
+    PRINT_ERR
     return "";
 }
 
 void update_register_value(instruction &ins) { 
     if(ins.type == 'R' || ins.type == 'I' || ins.type == 'U')  register_value[ins.rd] = ins.result; 
+    register_value[0] = 0; // x0 is always 0
 }
 
 void memory_access(instruction &ins) { 
@@ -118,47 +120,50 @@ void memory_access(instruction &ins) {
 
 int execute(instruction &ins){
     if(ins.type == 'R') { 
-        if(ins.opcode == "add")      return ins.rs1_value + ins.rs2_value;
-        else if(ins.opcode == "sub") return ins.rs1_value - ins.rs2_value;
-        else if(ins.opcode == "sll") return ins.rs1_value << ins.rs2_value;
-        else if(ins.opcode == "slt") return (ins.rs1_value < ins.rs2_value) ? 1 : 0;
-        else if(ins.opcode == "sltu") return (static_cast<unsigned>(ins.rs1_value) < static_cast<unsigned>(ins.rs2_value)) ? 1 : 0;
-        else if(ins.opcode == "xor") return ins.rs1_value ^ ins.rs2_value;
-        else if(ins.opcode == "srl") return static_cast<unsigned>(ins.rs1_value) >> ins.rs2_value;
-        else if(ins.opcode == "sra") return ins.rs1_value >> ins.rs2_value; 
-        else if(ins.opcode == "or")  return ins.rs1_value | ins.rs2_value;
-        else if(ins.opcode == "and") return ins.rs1_value & ins.rs2_value;
+        if(ins.opcode == "add") return ins.rs1_value + ins.rs2_value;
+        if(ins.opcode == "sub") return ins.rs1_value - ins.rs2_value;
+        if(ins.opcode == "sll") return ins.rs1_value << ins.rs2_value;
+        if(ins.opcode == "slt") return (ins.rs1_value < ins.rs2_value) ? 1 : 0;
+        if(ins.opcode == "sltu") return (static_cast<unsigned>(ins.rs1_value) < static_cast<unsigned>(ins.rs2_value)) ? 1 : 0;
+        if(ins.opcode == "xor") return ins.rs1_value ^ ins.rs2_value;
+        if(ins.opcode == "srl") return static_cast<unsigned>(ins.rs1_value) >> ins.rs2_value;
+        if(ins.opcode == "sra") return ins.rs1_value >> ins.rs2_value; 
+        if(ins.opcode == "or")  return ins.rs1_value | ins.rs2_value;
+        if(ins.opcode == "and") return ins.rs1_value & ins.rs2_value;
     }
-    else if(ins.type == 'I') {
+    if(ins.type == 'I') {
         if(ins.opcode == "addi")  return ins.rs1_value + ins.imm;
-        else if(ins.opcode == "slti")  return (ins.rs1_value < ins.imm) ? 1 : 0;
-        else if(ins.opcode == "sltiu") return (static_cast<unsigned>(ins.rs1_value) < static_cast<unsigned>(ins.imm)) ? 1 : 0;
-        else if(ins.opcode == "xori")  return ins.rs1_value ^ ins.imm;
-        else if(ins.opcode == "ori")   return ins.rs1_value | ins.imm;
-        else if(ins.opcode == "andi")  return ins.rs1_value & ins.imm;
-        else if(ins.opcode == "slli")  return ins.rs1_value << ins.imm;
-        else if(ins.opcode == "srli")  return static_cast<unsigned>(ins.rs1_value) >> ins.imm;
-        else if(ins.opcode == "srai")  return ins.rs1_value >> ins.imm; 
-        else if(ins.opcode == "lb"   || ins.opcode == "lbu" ||ins.opcode == "lh"   || ins.opcode == "lhu" ||
+        if(ins.opcode == "slti")  return (ins.rs1_value < ins.imm) ? 1 : 0;
+        if(ins.opcode == "sltiu") return (static_cast<unsigned>(ins.rs1_value) < static_cast<unsigned>(ins.imm)) ? 1 : 0;
+        if(ins.opcode == "xori")  return ins.rs1_value ^ ins.imm;
+        if(ins.opcode == "ori")   return ins.rs1_value | ins.imm;
+        if(ins.opcode == "andi")  return ins.rs1_value & ins.imm;
+        if(ins.opcode == "slli")  return ins.rs1_value << ins.imm;
+        if(ins.opcode == "srli")  return static_cast<unsigned>(ins.rs1_value) >> ins.imm;
+        if(ins.opcode == "srai")  return ins.rs1_value >> ins.imm; 
+        if(ins.opcode == "lb"   || ins.opcode == "lbu" ||ins.opcode == "lh"   || ins.opcode == "lhu" ||
                 ins.opcode == "lw"   || ins.opcode == "lwu" )
             return ins.rs1_value + ins.imm;
     }
-    else if(ins.type == 'S') {
-        return ins.rs1_value + ins.imm;
-    }
-    else if(ins.type == 'U') {
-        if(ins.opcode == "lui") return ins.imm; 
-    }
+    if(ins.type == 'S') return ins.rs1_value + ins.imm;
+    if(ins.type == 'U') return ins.imm;  
+    return 0;
+}
+
+int get_jump(instruction &ins){
+    if(ins.opcode=="jal")return ins.imm/4;
+    if(ins.opcode=="jalr")return (ins.rs1_value + ins.imm)/4;
     return 0;
 }
 
 bool manage_branch(instruction &ins){
-    if (ins.opcode == "beq" && register_value[ins.rs1] == register_value[ins.rs2])return true;
-    else if (ins.opcode == "bne" && register_value[ins.rs1] != register_value[ins.rs2])return true;
-    else if (ins.opcode == "blt" && register_value[ins.rs1] < register_value[ins.rs2])return true;
-    else if (ins.opcode == "bge" && register_value[ins.rs1] >= register_value[ins.rs2])return true;
-    else if (ins.opcode == "bltu" && static_cast<unsigned int>(register_value[ins.rs1]) < static_cast<unsigned int>(register_value[ins.rs2]))return true;
-    else if (ins.opcode == "bgeu" && static_cast<unsigned int>(register_value[ins.rs1]) >= static_cast<unsigned int>(register_value[ins.rs2]))return true; 
+    cout<<ins.rs1_value<<" "<<ins.rs2_value<<endl;
+    if (ins.opcode == "beq" && ins.rs1_value == ins.rs2_value)return true;
+    if (ins.opcode == "bne" && ins.rs1_value != ins.rs2_value)return true;
+    if (ins.opcode == "blt" && ins.rs1_value < ins.rs2_value)return true;
+    if (ins.opcode == "bge" && ins.rs1_value >= ins.rs2_value)return true;
+    if (ins.opcode == "bltu" && static_cast<unsigned int>(ins.rs1_value) < static_cast<unsigned int>(ins.rs2_value))return true;
+    if (ins.opcode == "bgeu" && static_cast<unsigned int>(ins.rs1_value) >= static_cast<unsigned int>(ins.rs2_value))return true; 
     return false; 
 }
 
@@ -268,7 +273,7 @@ instruction process_instruction(string input_format){
         }   
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
     }
-    else if(opcode == 0x6f) {
+    else if(opcode == 0x6f) {  // for jal
         //| imm[20] | imm[10:1] | imm[11] | imm[19:12] | rd (5 bits) | opcode (7 bits) |
         ins.type = 'J';
         ins.rd = (pc >> 7) & 0x1f;
@@ -279,11 +284,11 @@ instruction process_instruction(string input_format){
         if (ins.imm & (1 << 20)) {  
         ins.imm |= 0xFFF00000;   
         ins.opcode = func3_func7_check(pc, ins.funct3, ins.funct7);
+        }
     }
-    }
-    else if(opcode == 0x67){
+    else if(opcode == 0x67){  // for jalr
         //| imm[11:0] (12 bits) | rs1 (5 bits) | funct3 (3 bits) | rd (5 bits) | opcode (7 bits) |
-        ins.type = 'I';
+        ins.type = 'J';
         ins.rs1 = (pc >> 15) & 0x1f;
         ins.rd = (pc >> 7) & 0x1f;
         ins.imm = (pc >> 20) & 0xfff; 
@@ -300,16 +305,16 @@ instruction process_instruction(string input_format){
 // to get the expression like add x1 x0 0 from the instruction struct
 string get_expression(instruction &ins){
     if(ins.type == 'R')return ins.opcode + " x"+ to_string(ins.rd) + " x"+ to_string(ins.rs1) + " x"+ to_string(ins.rs2) ;
-    else if(ins.type == 'I') {
+    if(ins.type == 'I') {
         if(ins.opcode == "lb" || ins.opcode == "lh" || ins.opcode == "lw" || ins.opcode == "lbu" || ins.opcode == "lhu")
             return ins.opcode + " x"+ to_string(ins.rd) + " " + to_string(ins.imm) +  " x"+ to_string(ins.rs1) ;
         else
             return ins.opcode + " x"+ to_string(ins.rd) + " x"+ to_string(ins.rs1) + " " + to_string(ins.imm) ;
     }
-    else if(ins.type == 'S')return ins.opcode + " x"+ to_string(ins.rs2)  + " " + to_string(ins.imm)+ " x"+ to_string(ins.rs1);
-    else if(ins.type == 'B') return ins.opcode + " x"+ to_string(ins.rs1) + " x"+ to_string(ins.rs2) + " " + to_string(ins.imm);
-    else if(ins.type == 'U')return ins.opcode + " x"+ to_string(ins.rd) + " " + to_string(ins.imm);
-    else if(ins.type == 'J')return ins.opcode + " x"+ to_string(ins.rd) + ", " + to_string(ins.imm);
+    if(ins.type == 'S')return ins.opcode + " x"+ to_string(ins.rs2)  + " " + to_string(ins.imm)+ " x"+ to_string(ins.rs1);
+    if(ins.type == 'B') return ins.opcode + " x"+ to_string(ins.rs1) + " x"+ to_string(ins.rs2) + " " + to_string(ins.imm);
+    if(ins.type == 'U')return ins.opcode + " x"+ to_string(ins.rd) + " " + to_string(ins.imm);
+    if(ins.type == 'J')return ins.opcode + " x"+ to_string(ins.rd) + ", " + to_string(ins.imm);
     return "";
 }
 

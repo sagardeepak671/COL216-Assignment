@@ -4,12 +4,14 @@
 using namespace std;
 #include "instructions.hpp" 
 
-extern bool write_enabled[33];
+// extern bool write_enabled[33];
 extern int register_value[33];
+// extern map<int,int> memory;   // RAM
 extern uint8_t memory[10000];
 extern string input_file_name;
 extern string output_file_name;
-
+extern int number_of_instructions;
+extern vector<vector<int>> ans;
 
 const string HEX_TO_BIN[] = {
     "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111",
