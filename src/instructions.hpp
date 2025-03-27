@@ -23,6 +23,7 @@ string func3_func7_check(int pc,int funct3, int funct7);
 instruction process_instruction(string input_format);
 string get_expression(instruction &ins);
 bool manage_branch(instruction &ins);
+int get_jump(instruction &ins);
 int execute(instruction &ins);
 void memory_access(instruction &ins);
 
