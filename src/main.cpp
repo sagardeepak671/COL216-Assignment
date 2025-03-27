@@ -76,7 +76,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs1==pipeline.instruction_executed.rd){
             cout<<"here"<<endl;
-            if(forwarding)
+            if(forwarding && instruction_decoded.type!='B')
                 instruction_decoded.rs1_value = pipeline.instruction_executed.result;
             
             else stall=true;
@@ -93,7 +93,7 @@ bool get_rs_values(pipeline_stage &pipeline,instruction &instruction_decoded,boo
             else stall=true;
         }
         else if(pipeline.MEM_instruction_number != -1 && instruction_decoded.rs2==pipeline.instruction_executed.rd){
-            if(forwarding)
+            if(forwarding && instruction_decoded.type!='B') 
                 instruction_decoded.rs2_value = pipeline.instruction_executed.result;
             
             else stall=true;

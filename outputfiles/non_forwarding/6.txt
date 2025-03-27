@@ -1,5 +1,0 @@
-addi x1 x1 0        -> IF ;ID ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
-addi x1 x1 0        ->    ;IF ;ID ; - ; - ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
-blt x1 x0 0         ->    ;   ;IF ; - ; - ;ID ; - ; - ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
-addi x1 x1 0        ->    ;   ;   ;   ;   ;IF ; - ; - ;ID ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
-addi x1 x1 0        ->    ;   ;   ;   ;   ;   ;   ;   ;IF ;ID ; - ; - ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
