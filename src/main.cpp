@@ -149,6 +149,7 @@ void push_next_stage(pipeline_stage &pipeline,string instruction_fetched,instruc
     //pushing the instruction from EX stage to MEM stage
     pipeline.instruction_executed = pipeline.instruction_decoded;
     pipeline.MEM_instruction_number = pipeline.EX_instruction_number;
+    cout<<"abdc"<<pipeline.instruction_executed.result<<endl;
     
     //ID to EX stage
     if(!stall){
@@ -239,8 +240,9 @@ void compute(pipeline_stage &pipeline,bool forwarding){
     }
 
     if(pipeline.MEM_instruction_number != -1){
-        cout<<"memory access instruction: "<<pipeline.instruction_decoded.opcode<<" "<<(int)pipeline.instruction_decoded.rd<<" "<<(int)pipeline.instruction_decoded.rs1<<" "<<(int)pipeline.instruction_decoded.rs2<<endl;
-        memory_access(pipeline.instruction_decoded);
+        cout<<"memory access instruction: "<<pipeline.instruction_executed.opcode<<" "<<(int)pipeline.instruction_executed.rd<<" "<<(int)pipeline.instruction_executed.rs1<<" "<<(int)pipeline.instruction_executed.rs2<<endl;
+        cout<<"address"<<pipeline.instruction_executed.result<<endl;
+        memory_access(pipeline.instruction_executed);
     }
 
     if(pipeline.EX_instruction_number != -1){
@@ -248,6 +250,7 @@ void compute(pipeline_stage &pipeline,bool forwarding){
         int result =execute(pipeline.instruction_decoded);
         cout<<"result: "<<result<<endl;
         pipeline.instruction_decoded.result = result;
+        cout<< pipeline.instruction_decoded.result<<endl;
     }
 
     if(pipeline.ID_instruction_number != -1){

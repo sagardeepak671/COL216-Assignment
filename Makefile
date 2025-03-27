@@ -25,3 +25,8 @@ run_non_forwarding:
 	    echo "Running $$file"; \
 	    ./non_forwarding $$file; \
 	done
+
+# clean all the output files
+clean_output:
+	rm -f ./outputfiles/forwarding/*
+	rm -f ./outputfiles/non_forwarding/*

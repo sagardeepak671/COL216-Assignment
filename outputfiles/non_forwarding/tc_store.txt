@@ -1,5 +1,0 @@
-lui x5 0xa          -> IF ;ID ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
-addi x5 x5 -960     ->    ;IF ;ID ; - ; - ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
-sw x5 40 x6         ->    ;   ;IF ; - ; - ;ID ; - ; - ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
-sh x5 44 x6         ->    ;   ;   ;   ;   ;IF ; - ; - ;ID ; - ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
-sb x5 48 x6         ->    ;   ;   ;   ;   ;   ;   ;   ;IF ; - ;ID ;EX ;MEM;WB ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;   ;
